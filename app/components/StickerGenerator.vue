@@ -11,11 +11,30 @@
                 </CardHeader>
                 <CardContent class="grid gap-4">
                     <div class="grid gap-2">
-                        <Label for="sticker-title">Titel</Label>
+                        <div class="flex items-end justify-between gap-3">
+                            <Label for="sticker-title">Titel</Label>
+                            <NumberStepper
+                                v-model="content.titleSize"
+                                :min="16"
+                                :max="96"
+                                :step="2"
+                                label="Titelgrootte"
+                                class="w-[104px]"
+                            />
+                        </div>
                         <Input id="sticker-title" v-model="content.title" placeholder="Lorem ipsum dolor" />
                     </div>
                     <div class="grid gap-2">
-                        <Label for="sticker-body">Tekst</Label>
+                        <div class="flex items-end justify-between gap-3">
+                            <Label for="sticker-body">Tekst</Label>
+                            <NumberStepper
+                                v-model="content.bodySize"
+                                :min="10"
+                                :max="48"
+                                label="Tekstgrootte"
+                                class="w-[104px]"
+                            />
+                        </div>
                         <textarea
                             id="sticker-body"
                             v-model="content.body"
@@ -26,9 +45,22 @@
                         <p class="text-xs text-muted-foreground">Loopt automatisch door over meerdere regels.</p>
                     </div>
                     <div class="grid gap-2">
-                        <Label for="sticker-footer">Voettekst</Label>
+                        <div class="flex items-end justify-between gap-3">
+                            <Label for="sticker-footer">Voettekst</Label>
+                            <NumberStepper
+                                v-model="content.footerSize"
+                                :min="8"
+                                :max="40"
+                                label="Voettekstgrootte"
+                                class="w-[104px]"
+                            />
+                        </div>
                         <Input id="sticker-footer" v-model="content.footer" placeholder="Lorem ipsum dolor sit amet" />
                     </div>
+
+                    <Button variant="ghost" size="sm" class="justify-self-start" @click="resetSizes">
+                        Groottes terug naar de huisstijl
+                    </Button>
                 </CardContent>
             </Card>
 
@@ -108,8 +140,23 @@ const company = computed(() => COMPANIES[props.initialCompanyId] || COMPANIES[DE
 const content = reactive({
     title: 'Lorem ipsum dolor',
     body: 'Nam eu tortor tincidunt, facilisis augue ut, placerat mauris. Ut a est risus. Curabitur ac congue mauris, sed pulvinar augue.',
-    footer: 'Lorem ipsum dolor sit amet'
+    footer: 'Lorem ipsum dolor sit amet',
+    // Start from the company's own type spec, so an untouched sticker is
+    // exactly the approved design.
+    titleSize: company.value.sticker.title.size,
+    bodySize: company.value.sticker.body.size,
+    footerSize: company.value.sticker.footer.size
 })
+
+const resetSizes = () => {
+    const spec = company.value.sticker
+    content.titleSize = spec.title.size
+    content.bodySize = spec.body.size
+    content.footerSize = spec.footer.size
+}
+
+// Switching company brings its own type spec with it.
+watch(company, resetSizes)
 
 const canvasRef = ref(null)
 const frameRef = ref(null)

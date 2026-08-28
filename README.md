@@ -185,6 +185,12 @@ titel over meerdere regels gaat.
 > niet, dan is `STICKER.widthMm/heightMm` het enige dat hoeft te wijzigen —
 > de layout schaalt mee.
 
+De lettergroottes van de drie teksten zijn per sticker in te stellen. De
+regelafstand schaalt mee volgens de verhouding uit de spec, zodat regels niet
+over elkaar lopen; `resolveStickerType()` doet dat en wordt gedeeld door het
+voorbeeld en de PDF. Onaangeroerd is de sticker exact de goedgekeurde
+vormgeving, en één knop zet de groottes terug.
+
 Alleen de Casa Futura-spec was gegeven; de andere drie volgen dezelfde
 opbouw met hun eigen kleuren en logo's, en mogen nog nagekeken worden.
 

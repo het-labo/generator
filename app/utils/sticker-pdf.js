@@ -2,7 +2,7 @@
 // Mirrors sticker.js, so the preview and the print file cannot drift.
 
 import { PDF_FONTS, PDF_FAMILY, fetchPdfFont, imageToCanvas, loadPdfImage } from './pdf-shared.js'
-import { STICKER, STICKER_DESIGN, STICKER_TEXT, wrapLines } from './sticker.js'
+import { STICKER, STICKER_DESIGN, STICKER_TEXT, resolveStickerType, wrapLines } from './sticker.js'
 
 /** design units -> millimetres */
 const mm = (units) => (units * STICKER.widthMm) / STICKER_DESIGN.width
@@ -20,6 +20,7 @@ export const buildStickerPdf = async ({ company, content, assetUrl }) => {
   const { jsPDF } = await import('jspdf')
 
   const spec = company.sticker
+  const type = resolveStickerType(spec, content)
   const pageWidth = STICKER.widthMm + STICKER.bleed * 2
   const pageHeight = STICKER.heightMm + STICKER.bleed * 2
   const offset = STICKER.bleed
@@ -87,20 +88,20 @@ export const buildStickerPdf = async ({ company, content, assetUrl }) => {
     doc.text(str, xMm, offset + mm(topUnits + (style.lineHeight - style.size) / 2), options)
   }
 
-  measure.font = `${spec.title.weight || 400} ${spec.title.size}px ${spec.title.family}`
-  measure.letterSpacing = spec.title.letterSpacing ? `${spec.title.letterSpacing * spec.title.size}px` : '0px'
+  measure.font = `${type.title.weight || 400} ${type.title.size}px ${type.title.family}`
+  measure.letterSpacing = type.title.letterSpacing ? `${type.title.letterSpacing * type.title.size}px` : '0px'
   const titleLines = wrapLines(measure, (content.title || '').trim(), STICKER_TEXT.width)
-  titleLines.forEach((l, i) => line(l, spec.title, STICKER_TEXT.titleTop + i * spec.title.lineHeight, 'center', centre))
+  titleLines.forEach((l, i) => line(l, type.title, STICKER_TEXT.titleTop + i * type.title.lineHeight, 'center', centre))
 
-  const bodyTop = STICKER_TEXT.bodyTop + Math.max(titleLines.length - 1, 0) * spec.title.lineHeight
+  const bodyTop = STICKER_TEXT.bodyTop + Math.max(titleLines.length - 1, 0) * type.title.lineHeight
 
-  measure.font = `${spec.body.weight || 400} ${spec.body.size}px ${spec.body.family}`
+  measure.font = `${type.body.weight || 400} ${type.body.size}px ${type.body.family}`
   measure.letterSpacing = '0px'
   wrapLines(measure, content.body, STICKER_TEXT.width).forEach((l, i) =>
-    line(l, spec.body, bodyTop + i * spec.body.lineHeight, 'center', centre)
+    line(l, type.body, bodyTop + i * type.body.lineHeight, 'center', centre)
   )
 
-  line((content.footer || '').trim(), spec.footer, STICKER_TEXT.footerTop, 'left', offset + mm(STICKER_TEXT.footerX))
+  line((content.footer || '').trim(), type.footer, STICKER_TEXT.footerTop, 'left', offset + mm(STICKER_TEXT.footerX))
 
   return doc.output('blob')
 }

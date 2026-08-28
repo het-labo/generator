@@ -35,6 +35,26 @@ const TEXT = {
 
 export { FONT_STACKS }
 
+/**
+ * Applies the user's chosen sizes on top of a company's type spec.
+ *
+ * Line height scales with the size rather than staying fixed, otherwise
+ * enlarging the body text makes its lines overlap. The ratio comes from the
+ * spec, so the default sizes reproduce the approved design exactly.
+ */
+export const resolveStickerType = (spec, content = {}) => {
+  const scaled = (style, size) =>
+    size && size !== style.size
+      ? { ...style, size, lineHeight: Math.round(size * (style.lineHeight / style.size) * 100) / 100 }
+      : style
+
+  return {
+    title: scaled(spec.title, content.titleSize),
+    body: scaled(spec.body, content.bodySize),
+    footer: scaled(spec.footer, content.footerSize)
+  }
+}
+
 export const stickerPixelSize = (dpi = STICKER.dpi) => ({
   width: Math.round(((STICKER.widthMm + STICKER.bleed * 2) * dpi) / 25.4),
   height: Math.round(((STICKER.heightMm + STICKER.bleed * 2) * dpi) / 25.4)
@@ -113,6 +133,7 @@ export const renderSticker = async (canvas, { company, content, assetUrl, dpi = 
   if (!ctx) return
 
   const spec = company.sticker
+  const type = resolveStickerType(spec, content)
 
   const images = new Map()
   await Promise.all(
@@ -149,29 +170,29 @@ export const renderSticker = async (canvas, { company, content, assetUrl, dpi = 
   ctx.textBaseline = 'top'
 
   const title = (content.title || '').trim()
-  setFont(ctx, spec.title, spec.color)
+  setFont(ctx, type.title, spec.color)
   const titleLines = wrapLines(ctx, title, TEXT.width)
   titleLines.forEach((line, i) => {
-    const top = TEXT.titleTop + i * spec.title.lineHeight
-    ctx.fillText(line, centreX, top + (spec.title.lineHeight - spec.title.size) / 2)
+    const top = TEXT.titleTop + i * type.title.lineHeight
+    ctx.fillText(line, centreX, top + (type.title.lineHeight - type.title.size) / 2)
   })
 
   // The body sits below the title; extra title lines push it down rather than
   // overlapping it.
-  const bodyTop = TEXT.bodyTop + Math.max(titleLines.length - 1, 0) * spec.title.lineHeight
+  const bodyTop = TEXT.bodyTop + Math.max(titleLines.length - 1, 0) * type.title.lineHeight
 
-  setFont(ctx, spec.body, spec.color)
+  setFont(ctx, type.body, spec.color)
   wrapLines(ctx, content.body, TEXT.width).forEach((line, i) => {
-    const top = bodyTop + i * spec.body.lineHeight
-    ctx.fillText(line, centreX, top + (spec.body.lineHeight - spec.body.size) / 2)
+    const top = bodyTop + i * type.body.lineHeight
+    ctx.fillText(line, centreX, top + (type.body.lineHeight - type.body.size) / 2)
   })
 
   ctx.textAlign = 'left'
-  setFont(ctx, spec.footer, spec.color)
+  setFont(ctx, type.footer, spec.color)
   ctx.fillText(
     (content.footer || '').trim(),
     TEXT.footerX,
-    TEXT.footerTop + (spec.footer.lineHeight - spec.footer.size) / 2
+    TEXT.footerTop + (type.footer.lineHeight - type.footer.size) / 2
   )
 
   ctx.setTransform(1, 0, 0, 1, 0, 0)
