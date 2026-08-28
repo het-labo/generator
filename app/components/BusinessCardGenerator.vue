@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div ref="frameRef" class="grid gap-4 sm:grid-cols-2">
                 <figure v-for="side in SIDES" :key="side.id" class="space-y-2">
                     <div class="relative overflow-hidden rounded-lg border bg-muted/30">
                         <canvas :ref="(el) => (canvases[side.id] = el)" class="block w-full" />
@@ -147,10 +147,6 @@ const SIDES = [
     { id: 'back', label: 'Achterkant — jouw gegevens' }
 ]
 
-// The preview only has to look right on screen; rendering it at full 300 dpi
-// would redraw four megapixels on every keystroke.
-const PREVIEW_DPI = 96
-
 // The JPG is the fallback for people who cannot use the PDF, so it renders at
 // double the print resolution: at 300 dpi the 4.8pt footer lands on about 20
 // pixels, which is exactly where JPEG's block artefacts start eating letters.
@@ -165,6 +161,12 @@ const person = usePerson()
 const company = computed(() => COMPANIES[props.initialCompanyId] || COMPANIES[DEFAULT_COMPANY_ID])
 
 const canvases = reactive({ front: null, back: null })
+const frameRef = ref(null)
+
+// Rendered at the resolution the cards are actually displayed at, so the
+// preview never looks softer than the artwork really is. The two cards sit
+// side by side, hence half the frame width each.
+const { measure: measurePreviewDpi } = useCrispDpi(frameRef, (CARD.trimWidth + CARD.bleed * 2) * 2)
 const showGuides = ref(true)
 const busy = ref(false)
 
@@ -178,6 +180,7 @@ const guideStyle = computed(() => {
 
 const drawPreviews = async () => {
     await ensureCardFonts()
+    const dpi = measurePreviewDpi()
 
     for (const side of SIDES) {
         try {
@@ -186,7 +189,7 @@ const drawPreviews = async () => {
                 company: company.value,
                 person: person.value,
                 assetUrl,
-                dpi: PREVIEW_DPI
+                dpi
             })
         } catch (err) {
             console.error(err)
@@ -251,4 +254,5 @@ const downloadPdf = async () => {
 
 onMounted(drawPreviews)
 watch([person, company], drawPreviews, { deep: true })
+useRedrawOnResize(drawPreviews)
 </script>

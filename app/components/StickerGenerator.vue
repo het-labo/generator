@@ -76,7 +76,7 @@
                 <h2 class="text-lg font-semibold">Voorbeeld</h2>
                 <p class="text-sm text-muted-foreground">Op ware verhouding, inclusief afloop.</p>
             </div>
-            <div class="overflow-hidden rounded-lg border bg-muted/30">
+            <div ref="frameRef" class="overflow-hidden rounded-lg border bg-muted/30">
                 <canvas ref="canvasRef" class="block w-full" />
             </div>
         </div>
@@ -96,7 +96,6 @@ const props = defineProps({
     }
 })
 
-const PREVIEW_DPI = 96
 const IMAGE_EXPORT_DPI = 600
 
 const { app: { baseURL }, public: { assetRoot } } = useRuntimeConfig()
@@ -113,14 +112,19 @@ const content = reactive({
 })
 
 const canvasRef = ref(null)
+const frameRef = ref(null)
 const busy = ref(false)
+
+// The preview is rendered at whatever resolution it is actually displayed at,
+// so it never gets interpolated up and read as blurry artwork.
+const { measure: measurePreviewDpi } = useCrispDpi(frameRef, STICKER.widthMm + STICKER.bleed * 2)
 
 const exportSize = computed(() => stickerPixelSize(IMAGE_EXPORT_DPI))
 
 const draw = async () => {
     await ensureCardFonts()
     try {
-        await renderSticker(canvasRef.value, { company: company.value, content, assetUrl, dpi: PREVIEW_DPI })
+        await renderSticker(canvasRef.value, { company: company.value, content, assetUrl, dpi: measurePreviewDpi() })
     } catch (err) {
         console.error(err)
     }
@@ -173,5 +177,6 @@ const downloadImage = async () => {
 }
 
 watch([content, company], draw, { deep: true })
+useRedrawOnResize(draw)
 onMounted(draw)
 </script>

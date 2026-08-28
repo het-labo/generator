@@ -13,7 +13,7 @@
                 <div class="mb-3 flex items-center gap-2" :class="!expanded && 'justify-center'">
                     <Tooltip>
                         <TooltipTrigger as-child>
-                            <Button variant="ghost" size="icon" class="size-8 shrink-0" @click="expanded = !expanded">
+                            <Button variant="ghost" size="icon" class="size-8 shrink-0" @click="toggle">
                                 <PanelLeftIcon v-if="expanded" class="size-4" />
                                 <PanelLeftOpenIcon v-else class="size-4" />
                                 <span class="sr-only">{{ expanded ? 'Velden inklappen' : 'Velden uitklappen' }}</span>
@@ -89,6 +89,14 @@ const isWide = useMediaQuery('(min-width: 1280px)')
 
 const expanded = ref(true)
 const sheetOpen = ref(false)
+
+// Collapsing changes how wide the preview is drawn, but no window resize fires
+// for it. The canvases re-measure on 'resize', so tell them once the width
+// transition has finished.
+const toggle = () => {
+    expanded.value = !expanded.value
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 350)
+}
 
 // Growing past the breakpoint while the overlay is open would otherwise leave
 // it stranded over the inline sidebar.
