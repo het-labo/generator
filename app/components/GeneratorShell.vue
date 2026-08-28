@@ -18,6 +18,10 @@
                             <UserRoundIcon class="size-3.5" />
                             Profielfoto
                         </TabsTrigger>
+                        <TabsTrigger value="card" class="gap-1.5">
+                            <CreditCardIcon class="size-3.5" />
+                            Visitekaartje
+                        </TabsTrigger>
                     </TabsList>
 
                     <div class="hidden flex-1 justify-end lg:flex">
@@ -36,6 +40,9 @@
                 <TabsContent value="profile" class="mt-0">
                     <ProfilePhotoGenerator :initial-company-id="company.id" />
                 </TabsContent>
+                <TabsContent value="card" class="mt-0">
+                    <BusinessCardGenerator :initial-company-id="company.id" />
+                </TabsContent>
             </main>
         </Tabs>
 
@@ -45,7 +52,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { MailIcon, UserRoundIcon } from '@lucide/vue'
+import { CreditCardIcon, MailIcon, UserRoundIcon } from '@lucide/vue'
 
 const props = defineProps({
     company: {

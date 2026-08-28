@@ -35,24 +35,24 @@
                         <span class="flex size-6 items-center justify-center rounded-full bg-brand text-xs font-bold text-brand-foreground">1</span>
                         Je gegevens
                     </CardTitle>
-                    <CardDescription>Alleen deze vier velden zijn persoonlijk.</CardDescription>
+                    <CardDescription>Gedeeld met het visitekaartje — één keer invullen volstaat.</CardDescription>
                 </CardHeader>
                 <CardContent class="grid gap-4 sm:grid-cols-2">
                     <div class="grid gap-2">
                         <Label for="sig-name">Naam</Label>
-                        <Input id="sig-name" v-model="formData.name" placeholder="Voornaam Familienaam" />
+                        <Input id="sig-name" v-model="person.name" placeholder="Voornaam Familienaam" />
                     </div>
                     <div class="grid gap-2">
                         <Label for="sig-job">Functie</Label>
-                        <Input id="sig-job" v-model="formData.job" placeholder="bv. Zaakvoerder" />
+                        <Input id="sig-job" v-model="person.job" placeholder="bv. Zaakvoerder" />
                     </div>
                     <div class="grid gap-2">
                         <Label for="sig-email">E-mail</Label>
-                        <Input id="sig-email" v-model="formData.email" type="email" :placeholder="comp.emailPlaceholder" />
+                        <Input id="sig-email" v-model="person.email" type="email" :placeholder="comp.emailPlaceholder" />
                     </div>
                     <div class="grid gap-2">
                         <Label for="sig-phone">Telefoon</Label>
-                        <Input id="sig-phone" v-model="formData.phone" type="tel" placeholder="+32 000 00 00 00" />
+                        <Input id="sig-phone" v-model="person.phone" type="tel" placeholder="+32 000 00 00 00" />
                     </div>
                 </CardContent>
             </Card>
@@ -187,11 +187,11 @@ const comp = computed(() => COMPANIES[selectedCompanyId.value] || COMPANIES[DEFA
 
 const companyFieldsLocked = ref(true)
 
+// Name/job/e-mail/phone are shared with the other generators, so filling them
+// in once is enough. Only the company block lives locally.
+const person = usePerson()
+
 const formData = ref({
-    name: '',
-    job: '',
-    email: '',
-    phone: '',
     companyName: '',
     companyAddendum: 'bv',
     address: '',
@@ -240,7 +240,7 @@ watch(
 const signatureHtml = computed(() =>
     buildSignatureHtml({
         company: comp.value,
-        form: formData.value,
+        form: { ...person.value, ...formData.value },
         assetBase: config.assetBase
     })
 )

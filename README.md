@@ -1,6 +1,6 @@
 # Generator
 
-Interne branding-tool van [Het Labo](https://www.het-labo.be). Medewerkers van vier bouwbedrijven stellen er zelf hun **e-mailhandtekening** en **profielfoto** mee samen.
+Interne branding-tool van [Het Labo](https://www.het-labo.be). Medewerkers van vier bouwbedrijven stellen er zelf hun **e-mailhandtekening**, **profielfoto** en **visitekaartje** mee samen.
 
 Nuxt 4 (SPA, `ssr: false`) + Vue 3 + Tailwind v4 + [shadcn-vue](https://www.shadcn-vue.com). Volledig client-side; het enige server-onderdeel is `public/upload.php`, dat geüploade profielfoto's een permanente URL geeft.
 
@@ -23,6 +23,8 @@ Draait op http://localhost:3000. De startpagina toont de bedrijvenkiezer, `/:slu
 | `app/utils/signature.js` | Bouwt de handtekening-HTML. Zie waarschuwing hieronder |
 | `app/components/EmailSignatureGenerator.vue` | Formulier + live preview van de handtekening |
 | `app/components/ProfilePhotoGenerator.vue` | Canvas: ronde crop, zwart-wit, huisstijl-overlay |
+| `app/components/BusinessCardGenerator.vue` | Visitekaartjes, voor- en achterkant, drukklaar |
+| `app/utils/business-card.js` | Kaartlayout in millimeters; print-geometrie |
 | `app/components/GeneratorShell.vue` | Gedeelde chrome (header, tabs, footer) voor beide pagina's |
 | `app/components/SignaturePreview.vue` | Voorbeeldpaneel met desktop/mobiel, donkere-mail en tekenteller |
 | `app/components/ui/` | shadcn-vue componenten (broncode, aanpasbaar) |
@@ -99,6 +101,27 @@ npm run generate:companies
 ```
 
 Resultaat: `company-html/*.html` (~470 KB per stuk sinds shadcn-vue). Afbeeldingen blijven van `ASSET_BASE` komen, want inline base64 zou het bestand onwerkbaar groot maken.
+
+## Visitekaartjes
+
+`app/utils/business-card.js` tekent beide zijden op canvas en exporteert JPG.
+De print-geometrie staat bovenaan dat bestand en is niet vrijblijvend:
+
+| | |
+| --- | --- |
+| Snijformaat | 85 × 55 mm (Europese standaard) |
+| Afloop | 3 mm rondom → 91 × 61 mm |
+| Resolutie | 300 dpi → 1075 × 720 px |
+| Kleurruimte | sRGB — browsers exporteren geen CMYK |
+
+Per bedrijf staat de vormgeving in `COMPANIES[..].card`: achtergrond- en
+tekstkleuren, het lettertype van de naam, het logo voor de achterkant, en het
+watermerk op de voorkant met een optionele `crop` (de logobestanden bevatten
+zowel een beeldmerk als een woordmerk; de kaart wil meestal alleen het
+beeldmerk).
+
+De snijlijnen in het voorbeeld zijn een overlay en zitten **niet** in de
+export — de drukker krijgt schone bestanden.
 
 ## Configuratie
 

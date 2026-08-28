@@ -51,6 +51,28 @@ export const COMPANIES = {
     instagramUrl: 'https://www.instagram.com/mdbouw_altijdconstructief/',
     linkedinUrl: 'www.linkedin.com/company/md-bouw',
 
+    // Business card. Colors read off the approved reference cards; the front
+    // watermark is the regular logo drawn very faintly and cropped by the card
+    // edge, which is why scale is larger than 1.
+    card: {
+      frontBg: '#FDF9F3',
+      frontText: '#17313C',
+      frontMuted: '#5C6B73',
+      nameFont: 'sans',
+      backBg: '#17313C',
+      backLogo: 'assets/logos/logo-md-white.png',
+      backLogoScale: 0.42,
+      tagline: '',
+      watermark: {
+        src: 'assets/logos/logo-md-primair.png',
+        // Only the circle mark; the file also carries the wordmark below it.
+        crop: { x: 0.32, y: 0.01, w: 0.36, h: 0.51 },
+        opacity: 0.05,
+        scale: 0.78,
+        x: 0.74,
+        y: 0.46
+      }
+    },
     overlays: [
       { id: 'full', src: 'assets/overlays/full.png', label: 'Volledig' },
       { id: 'half', src: 'assets/overlays/half.png', label: 'Gradient' }
@@ -92,6 +114,17 @@ export const COMPANIES = {
     instagramUrl: '',
     linkedinUrl: '',
 
+    card: {
+      frontBg: '#FFFBF6',
+      frontText: '#3F4A44',
+      frontMuted: '#6B736E',
+      nameFont: 'serif',
+      backBg: '#4E5A54',
+      backLogo: 'assets/logos/logo-cf-white.png',
+      backLogoScale: 0.34,
+      tagline: 'waar wonen toekomst krijgt',
+      watermark: { src: 'assets/logos/logo-cf.png', opacity: 0.1, scale: 0.3, x: 0.84, y: 0.55 }
+    },
     overlays: [
       { id: 'full-cf', src: 'assets/overlays/full-cf.png', label: 'Volledig' },
       { id: 'half-cf', src: 'assets/overlays/half-cf.png', label: 'Gradient' }
@@ -134,6 +167,25 @@ export const COMPANIES = {
     instagramUrl: '',
     linkedinUrl: '',
 
+    card: {
+      frontBg: '#FFFBF6',
+      frontText: '#0A395C',
+      frontMuted: '#4A6076',
+      nameFont: 'sans',
+      backBg: '#0A395C',
+      backLogo: 'assets/logos/logo-ge-white.png',
+      backLogoScale: 0.42,
+      tagline: '',
+      watermark: {
+        src: 'assets/logos/logo-ge.png',
+        // The 'G' mark at the far left of the wordmark file.
+        crop: { x: 0, y: 0, w: 0.155, h: 0.72 },
+        opacity: 0.06,
+        scale: 0.26,
+        x: 0.76,
+        y: 0.5
+      }
+    },
     overlays: [
       { id: 'full-ge', src: 'assets/overlays/full-ge.png', label: 'Volledig' },
       { id: 'half-ge', src: 'assets/overlays/half-ge.png', label: 'Gradient' }
@@ -176,6 +228,22 @@ export const COMPANIES = {
     instagramUrl: '',
     linkedinUrl: '',
 
+    card: {
+      frontBg: '#FFFFFF',
+      frontText: '#111111',
+      frontMuted: '#4A4A4A',
+      nameFont: 'sans',
+      // HVM's reference card carries a cream diagonal out of the top-right
+      // corner instead of a centred mark.
+      accentShape: { color: '#FEF6EE' },
+      // The reference card breaks the name over two lines.
+      nameLines: 2,
+      backBg: '#B90000',
+      backLogo: 'assets/logos/logo-hvm-white.png',
+      backLogoScale: 0.30,
+      tagline: 'vakwerk tot in de nok',
+      watermark: { src: 'assets/logos/logo-hvm.png', opacity: 0.05, scale: 0.34, x: 0.5, y: 0.82 }
+    },
     overlays: [
       { id: 'full-hvm', src: 'assets/overlays/full-hvm.png', label: 'Volledig' },
       { id: 'half-hvm', src: 'assets/overlays/half-hvm.png', label: 'Gradient' }
