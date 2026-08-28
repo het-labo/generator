@@ -1,6 +1,6 @@
 <template>
-    <div class="grid gap-8 xl:grid-cols-[minmax(0,480px)_minmax(0,1fr)] xl:items-start">
-        <div class="space-y-6">
+    <GeneratorLayout label="Handtekening">
+        <template #inputs>
             <Card v-if="!hideSelection">
                 <CardHeader>
                     <CardTitle class="text-base">Bedrijf</CardTitle>
@@ -126,9 +126,11 @@
                     </div>
                 </CardContent>
             </Card>
-        </div>
 
-        <div class="space-y-4 xl:sticky xl:top-24">
+        </template>
+
+        <template #preview>
+        <div class="space-y-4">
             <div>
                 <h2 class="text-lg font-semibold">Voorbeeld</h2>
                 <p class="text-sm text-muted-foreground">Kopieer en plak in Outlook, Gmail of Apple Mail.</p>
@@ -147,7 +149,8 @@
                 </Button>
             </div>
         </div>
-    </div>
+        </template>
+    </GeneratorLayout>
 </template>
 
 <script setup>

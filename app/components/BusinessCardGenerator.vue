@@ -1,6 +1,6 @@
 <template>
-    <div class="grid gap-8 xl:grid-cols-[minmax(0,480px)_minmax(0,1fr)] xl:items-start">
-        <div class="space-y-6">
+    <GeneratorLayout label="Visitekaartje">
+        <template #inputs>
             <Card>
                 <CardHeader>
                     <CardTitle class="flex items-center gap-2 text-base">
@@ -87,9 +87,11 @@
                     </div>
                 </CardContent>
             </Card>
-        </div>
 
-        <div class="space-y-4 xl:sticky xl:top-24">
+        </template>
+
+        <template #preview>
+        <div class="space-y-4">
             <div class="flex items-start justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-semibold">Voorbeeld</h2>
@@ -124,7 +126,8 @@
                 De rode lijn is het snijformaat. Alles daarbuiten is afloop en wordt weggesneden.
             </p>
         </div>
-    </div>
+        </template>
+    </GeneratorLayout>
 </template>
 
 <script setup>

@@ -1,6 +1,6 @@
 # Generator
 
-Interne branding-tool van [Het Labo](https://www.het-labo.be). Medewerkers van vier bouwbedrijven stellen er zelf hun **e-mailhandtekening**, **profielfoto** en **visitekaartje** mee samen.
+Interne branding-tool van [Het Labo](https://www.het-labo.be). Medewerkers van vier bouwbedrijven stellen er zelf hun **e-mailhandtekening**, **profielfoto**, **visitekaartje** en **sticker** mee samen.
 
 Nuxt 4 (SPA, `ssr: false`) + Vue 3 + Tailwind v4 + [shadcn-vue](https://www.shadcn-vue.com). Volledig client-side; het enige server-onderdeel is `public/upload.php`, dat geüploade profielfoto's een permanente URL geeft.
 
@@ -24,7 +24,10 @@ Draait op http://localhost:3000. De startpagina toont de bedrijvenkiezer, `/:slu
 | `app/components/EmailSignatureGenerator.vue` | Formulier + live preview van de handtekening |
 | `app/components/ProfilePhotoGenerator.vue` | Canvas: ronde crop, zwart-wit, huisstijl-overlay |
 | `app/components/BusinessCardGenerator.vue` | Visitekaartjes, voor- en achterkant, drukklaar |
-| `app/utils/business-card.js` | Kaartlayout in millimeters; print-geometrie |
+| `app/utils/business-card.js` | Kaartlayout in designeenheden; print-geometrie |
+| `app/components/StickerGenerator.vue` | Sticker met vrij invulbare tekst |
+| `app/utils/sticker.js` | Stickerlayout; zie de aanname over het formaat |
+| `app/components/GeneratorLayout.vue` | Inklapbare zijbalk met de invoervelden |
 | `app/components/GeneratorShell.vue` | Gedeelde chrome (header, tabs, footer) voor beide pagina's |
 | `app/components/SignaturePreview.vue` | Voorbeeldpaneel met desktop/mobiel, donkere-mail en tekenteller |
 | `app/components/ui/` | shadcn-vue componenten (broncode, aanpasbaar) |
@@ -168,6 +171,30 @@ kaarten correct — ze werken volledig offline.
 
 De snijlijnen in het voorbeeld zijn een overlay en zitten **niet** in de
 export — de drukker krijgt schone bestanden.
+
+## Stickers
+
+`app/utils/sticker.js`, opgezet als de visitekaartjes: coördinaten zijn de
+Figma-eenheden van het artboard (1016 × 638). Titel, tekst en voettekst zijn
+vrij invulbaar; de tekst loopt automatisch door en het blok schuift mee als de
+titel over meerdere regels gaat.
+
+> **Aanname over het formaat.** Het Figma-bestand geeft geen millimeters. Dit
+> gaat uit van 10 designeenheden per mm, dus **101,6 × 63,8 mm**, wat past bij
+> de ronde maten elders in de spec (35 eenheden marge = 3,5 mm). Klopt dat
+> niet, dan is `STICKER.widthMm/heightMm` het enige dat hoeft te wijzigen —
+> de layout schaalt mee.
+
+Alleen de Casa Futura-spec was gegeven; de andere drie volgen dezelfde
+opbouw met hun eigen kleuren en logo's, en mogen nog nagekeken worden.
+
+## Logo's
+
+De correcte bestanden komen uit de huisstijlmappen op Drive. Let op de
+varianten: HVM heeft `logo-hvm-white` (alles wit, voor de sticker) én
+`logo-hvm-white-black` (witte dakvorm, zwarte woordmerk — voor het
+visitekaartje). Casa Futura levert SVG's; de witte en lichte varianten in
+`public/assets/logos/` zijn daaruit afgeleid door de stroke te vervangen.
 
 ## Configuratie
 

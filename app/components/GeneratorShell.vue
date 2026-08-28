@@ -22,6 +22,10 @@
                             <CreditCardIcon class="size-3.5" />
                             Visitekaartje
                         </TabsTrigger>
+                        <TabsTrigger value="sticker" class="gap-1.5">
+                            <StickerIcon class="size-3.5" />
+                            Sticker
+                        </TabsTrigger>
                     </TabsList>
 
                     <div class="hidden flex-1 justify-end lg:flex">
@@ -43,6 +47,9 @@
                 <TabsContent value="card" class="mt-0">
                     <BusinessCardGenerator :initial-company-id="company.id" />
                 </TabsContent>
+                <TabsContent value="sticker" class="mt-0">
+                    <StickerGenerator :initial-company-id="company.id" />
+                </TabsContent>
             </main>
         </Tabs>
 
@@ -52,7 +59,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { CreditCardIcon, MailIcon, UserRoundIcon } from '@lucide/vue'
+import { CreditCardIcon, MailIcon, StickerIcon, UserRoundIcon } from '@lucide/vue'
 
 const props = defineProps({
     company: {

@@ -58,34 +58,10 @@ export const COMPANIES = {
     card: {
       front: {
         bg: '#17313C',
-        // Only the circle mark exists as a white asset; the wordmark and
-        // baseline below it are set from the spec's boxes.
         logo: 'assets/logos/logo-md-white.png',
-        logoWidth: 129.19,
+        logoWidth: 373.65,
         logoCx: 600,
-        logoCy: 327.13,
-        lockup: [
-          {
-            text: 'MD BOUW',
-            family: FONT_STACKS.workSans,
-            weight: 600,
-            size: 47.74,
-            lineHeight: 47.74,
-            top: 421.87,
-            targetWidth: 365.04,
-            color: '#FFFFFF'
-          },
-          {
-            text: 'altijd constructief',
-            family: FONT_STACKS.workSans,
-            weight: 400,
-            size: 28,
-            lineHeight: 28.81,
-            top: 485.11,
-            targetWidth: 243.88,
-            color: '#FFFFFF'
-          }
-        ]
+        logoCy: 388.235
       },
       back: {
         bg: '#FFFAF6',
@@ -109,6 +85,17 @@ export const COMPANIES = {
           opacity: 0.05
         }
       }
+    },
+    sticker: {
+      bg: '#17313C',
+      color: '#FFFFFF',
+      logo: 'assets/logos/logo-md-white.png',
+      logoBox: { x: 35, y: 35, width: 190, height: 132 },
+      monogram: 'assets/logos/monogram-md-white.png',
+      monogramBox: { x: 900, y: 483, width: 118, height: 116 },
+      title: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 52, letterSpacing: -0.015 },
+      body: { family: FONT_STACKS.sourceSans, weight: 400, size: 22, lineHeight: 32 },
+      footer: { family: FONT_STACKS.sourceSans, weight: 400, size: 18, lineHeight: 26 }
     },
     overlays: [
       { id: 'full', src: 'assets/overlays/full.png', label: 'Volledig' },
@@ -154,7 +141,7 @@ export const COMPANIES = {
     card: {
       front: {
         bg: '#4E5A54',
-        logo: 'assets/logos/logo-cf-white.png',
+        logo: 'assets/logos/logo-cf-white.svg',
         logoWidth: 351.91,
         logoCx: 600,
         logoCy: 388.235,
@@ -179,15 +166,26 @@ export const COMPANIES = {
           contact: { family: FONT_STACKS.lato, size: 32, lineHeight: 38 },
           footer: { family: FONT_STACKS.lato, size: 24, lineHeight: 29 }
         },
-        // The monogram is three outlined rectangles rather than a bitmap.
-        outlineColor: '#E8E6E3',
-        outlineWidth: 13.153,
-        outlines: [
-          { x: 959.52, y: 307.48, w: 155.52, h: 383.96 },
-          { x: 959.52, y: 307.48, w: 155.52, h: 244.42 },
-          { x: 1037.28, y: 443.67, w: 77.76, h: 247.77 }
-        ]
+        watermark: {
+          src: 'assets/logos/monogram-cf-light.svg',
+          x: 959.52,
+          y: 307.48,
+          width: 155.52,
+          height: 383.96
+        }
       }
+    },
+    // Sticker. Design units are the Figma artboard, 1016 x 638; see sticker.js.
+    sticker: {
+      bg: '#4E5A54',
+      color: '#FFFFFF',
+      logo: 'assets/logos/logo-cf-white.svg',
+      logoBox: { x: 35, y: 35, width: 220, height: 122.31 },
+      monogram: 'assets/logos/monogram-cf-white.svg',
+      monogramBox: { x: 930, y: 483, width: 51.34, height: 120 },
+      title: { family: FONT_STACKS.baskerville, weight: 400, size: 48, lineHeight: 52, letterSpacing: -0.015 },
+      body: { family: FONT_STACKS.lato, weight: 400, size: 22, lineHeight: 32 },
+      footer: { family: FONT_STACKS.lato, weight: 400, size: 18, lineHeight: 26 }
     },
     overlays: [
       { id: 'full-cf', src: 'assets/overlays/full-cf.png', label: 'Volledig' },
@@ -262,6 +260,17 @@ export const COMPANIES = {
         }
       }
     },
+    sticker: {
+      bg: '#0B395C',
+      color: '#FFFFFF',
+      logo: 'assets/logos/logo-ge-white.png',
+      logoBox: { x: 35, y: 35, width: 260, height: 55 },
+      monogram: 'assets/logos/monogram-ge-white.png',
+      monogramBox: { x: 908, y: 495, width: 108, height: 108 },
+      title: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 52, letterSpacing: -0.015 },
+      body: { family: FONT_STACKS.sourceSans, weight: 400, size: 22, lineHeight: 32 },
+      footer: { family: FONT_STACKS.sourceSans, weight: 400, size: 18, lineHeight: 26 }
+    },
     overlays: [
       { id: 'full-ge', src: 'assets/overlays/full-ge.png', label: 'Volledig' },
       { id: 'half-ge', src: 'assets/overlays/half-ge.png', label: 'Gradient' }
@@ -307,7 +316,8 @@ export const COMPANIES = {
     card: {
       front: {
         bg: '#B90000',
-        logo: 'assets/logos/logo-hvm-white.png',
+        // White mark with black wordmark — the variant the approved card uses.
+        logo: 'assets/logos/logo-hvm-white-black.png',
         logoWidth: 332,
         logoCx: 600,
         logoCy: 388.235,
@@ -337,6 +347,17 @@ export const COMPANIES = {
         wedgeColor: '#FFFAF6',
         wedge: { x: 600, y: 600 }
       }
+    },
+    sticker: {
+      bg: '#B90000',
+      color: '#FFFFFF',
+      logo: 'assets/logos/logo-hvm-white.png',
+      logoBox: { x: 35, y: 35, width: 150, height: 172.6 },
+      monogram: 'assets/logos/monogram-hvm-white.png',
+      monogramBox: { x: 908, y: 495, width: 108, height: 108 },
+      title: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 52, letterSpacing: -0.015 },
+      body: { family: FONT_STACKS.sourceSans, weight: 400, size: 22, lineHeight: 32 },
+      footer: { family: FONT_STACKS.sourceSans, weight: 400, size: 18, lineHeight: 26 }
     },
     overlays: [
       { id: 'full-hvm', src: 'assets/overlays/full-hvm.png', label: 'Volledig' },
