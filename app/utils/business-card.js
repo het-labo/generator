@@ -1,22 +1,27 @@
 // Renders the business cards onto a canvas, print-ready.
 //
-// Print geometry, all of it fixed by what a printer expects:
-//   - trim size 85 × 55 mm (European standard, and the ratio of the approved
-//     reference cards)
-//   - 3 mm bleed on every side, so the background survives the guillotine
-//   - 300 dpi, because anything less prints visibly soft
+// COORDINATES: everything below is expressed in the design units of the Figma
+// artboard — 1200 × 776.47, which IS the trim area. The canvas is scaled once
+// so those numbers can be copied straight out of the spec without conversion
+// arithmetic, and the bleed is added around the outside.
 //
-// Everything below is positioned in millimetres relative to the TRIM edge and
-// converted once, so the layout stays the same if the dpi ever changes.
+// PRINT GEOMETRY, fixed by what the printer expects:
+//   - trim 85 × 55 mm (European standard; 1200/776.47 is exactly that ratio)
+//   - 3 mm bleed on every side, so the background survives the guillotine
+//   - 300 dpi
+//
+// SIDES: 'front' is the logo side, 'back' is the side carrying the person's
+// details — matching how the approved Figma files are named.
 
 export const CARD = {
   trimWidth: 85,
   trimHeight: 55,
   bleed: 3,
-  // Distance text must keep from the trim edge; printers cut with tolerance.
-  safeMargin: 6,
   dpi: 300
 }
+
+/** The Figma artboard. One design unit = 85mm / 1200. */
+export const DESIGN = { width: 1200, height: 776.47 }
 
 export const MM_TO_PX = (mm, dpi = CARD.dpi) => Math.round((mm * dpi) / 25.4)
 
@@ -25,25 +30,16 @@ export const cardPixelSize = (dpi = CARD.dpi) => ({
   height: MM_TO_PX(CARD.trimHeight + CARD.bleed * 2, dpi)
 })
 
-const FONTS = {
-  sans: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-  serif: "Georgia, 'Times New Roman', serif"
+// Fallbacks matter: the standalone single-file build has no network, so the
+// webfonts are unavailable there and these stacks decide what prints.
+export const FONT_STACKS = {
+  workSans: "'Work Sans', system-ui, sans-serif",
+  sourceSans: "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif",
+  lato: "'Lato', system-ui, sans-serif",
+  baskerville: "'Libre Baskerville', Baskerville, Georgia, serif",
+  robotoMono: "'Roboto Mono', ui-monospace, monospace"
 }
 
-// Type scale in millimetres, measured off the reference cards.
-const TYPE = {
-  name: { size: 5.4, weight: 700, y: 9.6 },
-  nameLine2: { y: 15.2 },
-  job: { size: 2.9, weight: 400, y: 13.4 },
-  jobTwoLine: { y: 19.0 },
-  contact: { size: 3.4, weight: 400, y: 20.6, lineHeight: 4.4 },
-  contactTwoLine: { y: 26.2 },
-  footer: { size: 2.9, weight: 400, y: 46.6, lineHeight: 4.0 },
-  tagline: { size: 3.0, weight: 400, y: 48.0 }
-}
-
-// Cached, because every keystroke re-renders both sides and re-decoding the
-// logos each time is what made rendering slow enough to interleave.
 const imageCache = new Map()
 
 const loadImage = (src) => {
@@ -66,38 +62,145 @@ const loadImage = (src) => {
 }
 
 /**
- * Draws an image scaled to a fraction of the card width, centred on a point
- * given as a fraction of the full (bleed-inclusive) canvas.
+ * Draws one line of text positioned the way the spec describes it: by the top
+ * of its line box, with the glyphs centred in that box (CSS half-leading).
  */
-const drawContained = (ctx, img, { canvasWidth, canvasHeight, widthFraction, x, y, opacity = 1, crop }) => {
-  // crop selects a region of the source image, in fractions — the logo files
-  // bundle a mark and a wordmark, and the cards only want the mark.
+const drawText = (ctx, str, style) => {
+  if (!str) return
+
+  ctx.save()
+  ctx.fillStyle = style.color
+  if (style.opacity != null) ctx.globalAlpha = style.opacity
+  ctx.font = `${style.weight || 400} ${style.size}px ${style.family}`
+  ctx.textBaseline = 'top'
+  ctx.textAlign = style.align || 'left'
+  if (style.letterSpacing) ctx.letterSpacing = style.letterSpacing
+
+  ctx.fillText(str, style.x, style.top + (style.lineHeight - style.size) / 2)
+  ctx.restore()
+}
+
+/**
+ * Draws centred text stretched to an exact width by tuning letter-spacing.
+ * The Figma spec gives logo lockups as boxes of a known width; matching that
+ * width is what keeps the wordmark looking like the logo rather than like
+ * ordinary text set in the brand font.
+ */
+const drawTextFitted = (ctx, str, style) => {
+  if (!str) return
+
+  ctx.save()
+  ctx.font = `${style.weight || 400} ${style.size}px ${style.family}`
+  ctx.letterSpacing = '0px'
+
+  const natural = ctx.measureText(str).width
+  const gaps = Math.max(str.length - 1, 1)
+  const spacing = (style.targetWidth - natural) / gaps
+  ctx.restore()
+
+  drawText(ctx, str, { ...style, letterSpacing: `${spacing}px`, align: 'center', x: style.cx + spacing / 2 })
+}
+
+/** Draws an image at an exact box, preserving aspect ratio by fitting width. */
+const drawImageAt = (ctx, img, { x, y, width, height, opacity = 1, crop }) => {
   const sx = crop ? img.width * crop.x : 0
   const sy = crop ? img.height * crop.y : 0
   const sw = crop ? img.width * crop.w : img.width
   const sh = crop ? img.height * crop.h : img.height
 
-  const targetWidth = canvasWidth * widthFraction
-  const targetHeight = sh * (targetWidth / sw)
+  const drawWidth = width
+  const drawHeight = height ?? sh * (width / sw)
 
   ctx.save()
   ctx.globalAlpha = opacity
-  ctx.drawImage(
-    img,
-    sx, sy, sw, sh,
-    canvasWidth * x - targetWidth / 2,
-    canvasHeight * y - targetHeight / 2,
-    targetWidth,
-    targetHeight
-  )
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, drawWidth, drawHeight)
   ctx.restore()
+}
+
+/** Centres an image of a given width on a point, keeping its aspect ratio. */
+const drawImageCentred = (ctx, img, { cx, cy, width, crop }) => {
+  const sw = crop ? img.width * crop.w : img.width
+  const sh = crop ? img.height * crop.h : img.height
+  const height = sh * (width / sw)
+  drawImageAt(ctx, img, { x: cx - width / 2, y: cy - height / 2, width, height, crop })
+}
+
+const drawBack = (ctx, { card, company, person, images }) => {
+  const spec = card.back
+
+  // HVM's card is white with a cream wedge left showing in the top-right
+  // corner, rather than a flat background.
+  if (spec.wedge) {
+    ctx.fillStyle = spec.wedgeColor
+    ctx.beginPath()
+    ctx.moveTo(spec.wedge.x, 0)
+    ctx.lineTo(DESIGN.width, 0)
+    ctx.lineTo(DESIGN.width, spec.wedge.y)
+    ctx.closePath()
+    ctx.fill()
+  }
+
+  // Faint mark behind the text.
+  if (spec.watermark) {
+    const mark = images.get(spec.watermark.src)
+    if (mark) drawImageAt(ctx, mark, spec.watermark)
+  }
+
+  // Casa Futura's monogram is three outlined rectangles, per the spec.
+  for (const r of spec.outlines || []) {
+    ctx.save()
+    ctx.strokeStyle = spec.outlineColor
+    ctx.lineWidth = spec.outlineWidth
+    ctx.strokeRect(r.x, r.y, r.w, r.h)
+    ctx.restore()
+  }
+
+  const { x, color, type } = spec
+  const name = (person.name || '').trim() || 'Voornaam Familienaam'
+
+  if (spec.nameLines === 2 && name.includes(' ')) {
+    const cut = name.lastIndexOf(' ')
+    drawText(ctx, name.slice(0, cut), { ...type.name, x, color, top: spec.y.name })
+    drawText(ctx, name.slice(cut + 1), { ...type.name, x, color, top: spec.y.name + type.name.lineHeight })
+  } else {
+    drawText(ctx, name, { ...type.name, x, color, top: spec.y.name })
+  }
+
+  drawText(ctx, (person.job || '').trim(), { ...type.job, x, color, top: spec.y.job })
+  drawText(ctx, (person.phone || '').trim(), { ...type.contact, x, color, top: spec.y.phone })
+  drawText(ctx, (person.email || '').trim(), { ...type.contact, x, color, top: spec.y.email })
+
+  drawText(ctx, company.websiteUrl.replace(/^https?:\/\//i, ''), {
+    ...type.footer,
+    x,
+    color,
+    top: spec.y.website
+  })
+  drawText(ctx, company.address, { ...type.footer, x, color, top: spec.y.address })
+}
+
+const drawFront = (ctx, { card, images }) => {
+  const spec = card.front
+
+  const logo = images.get(spec.logo)
+  if (logo) drawImageCentred(ctx, logo, { cx: spec.logoCx, cy: spec.logoCy, width: spec.logoWidth, crop: spec.logoCrop })
+
+  // Some lockups are only available as a mark; the wordmark under it is set
+  // from the brand font to the width the spec gives.
+  for (const part of spec.lockup || []) {
+    drawTextFitted(ctx, part.text, { ...part, cx: DESIGN.width / 2 })
+  }
+
+  if (spec.tagline) {
+    drawText(ctx, spec.tagline.text, { ...spec.tagline, align: 'center', x: DESIGN.width / 2 })
+  }
 }
 
 /**
  * Renders one side of a company's business card.
  *
  * @param canvas   target <canvas>; resized to the full bleed size
- * @param side     'front' | 'back'
+ * @param side     'front' (logo) | 'back' (personal details)
  * @param company  a record from COMPANIES
  * @param person   { name, job, phone, email }
  * @param assetUrl resolves a public/ path to something the canvas may load
@@ -107,17 +210,18 @@ export const renderCard = async (canvas, { side, company, person, assetUrl, dpi 
   const ctx = canvas?.getContext('2d')
   if (!ctx) return
 
-  const cfgEarly = company.card
+  const card = company.card
+  const spec = card[side]
 
-  // Load every asset this side needs BEFORE touching the canvas. Drawing then
-  // happens in one synchronous pass, so two overlapping renders can never
-  // interleave — which previously stacked the watermark's alpha on itself.
-  const needed = side === 'back' ? [cfgEarly.backLogo] : cfgEarly.watermark ? [cfgEarly.watermark.src] : []
-  const loaded = new Map()
+  // Load every asset up front. Drawing then happens in one synchronous pass,
+  // so two overlapping renders cannot interleave — which used to stack the
+  // watermark's alpha on top of itself.
+  const sources = [spec.logo, spec.watermark?.src].filter(Boolean)
+  const images = new Map()
   await Promise.all(
-    needed.map((src) =>
+    sources.map((src) =>
       loadImage(assetUrl(src))
-        .then((img) => loaded.set(src, img))
+        .then((img) => images.set(src, img))
         .catch((err) => console.error(err))
     )
   )
@@ -126,100 +230,21 @@ export const renderCard = async (canvas, { side, company, person, assetUrl, dpi 
   canvas.width = width
   canvas.height = height
 
-  const px = (mm) => MM_TO_PX(mm, dpi)
-  const bleed = px(CARD.bleed)
-  // Text coordinates are trim-relative, so shift them into the bleed canvas.
-  const left = bleed + px(CARD.safeMargin)
-  const atY = (mm) => bleed + px(mm)
-
-  const cfg = company.card
-
+  // Background covers the bleed as well, so the guillotine cannot expose paper.
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
   ctx.clearRect(0, 0, width, height)
-  ctx.fillStyle = side === 'back' ? cfg.backBg : cfg.frontBg
+  ctx.fillStyle = spec.bg
   ctx.fillRect(0, 0, width, height)
 
-  if (side === 'back') {
-    const logo = loaded.get(cfg.backLogo)
-    if (logo) drawContained(ctx, logo, {
-      canvasWidth: width,
-      canvasHeight: height,
-      widthFraction: cfg.backLogoScale,
-      x: 0.5,
-      y: cfg.tagline ? 0.46 : 0.5
-    })
+  // From here on, draw in Figma design units.
+  const scale = MM_TO_PX(CARD.trimWidth, dpi) / DESIGN.width
+  const bleedPx = MM_TO_PX(CARD.bleed, dpi)
+  ctx.setTransform(scale, 0, 0, scale, bleedPx, bleedPx)
 
-    if (cfg.tagline) {
-      ctx.fillStyle = 'rgba(255,255,255,0.85)'
-      ctx.font = `${TYPE.tagline.weight} ${px(TYPE.tagline.size)}px ${FONTS.sans}`
-      ctx.textAlign = 'center'
-      ctx.fillText(cfg.tagline, width / 2, atY(TYPE.tagline.y))
-      ctx.textAlign = 'left'
-    }
-    return
-  }
+  if (side === 'back') drawBack(ctx, { card, company, person, images })
+  else drawFront(ctx, { card, images })
 
-  // --- front ---
-
-  // HVM's card carries a cream diagonal out of the top-right corner instead of
-  // a centred mark.
-  if (cfg.accentShape) {
-    ctx.fillStyle = cfg.accentShape.color
-    ctx.beginPath()
-    ctx.moveTo(width * 0.52, 0)
-    ctx.lineTo(width, 0)
-    ctx.lineTo(width, height * 0.72)
-    ctx.closePath()
-    ctx.fill()
-  }
-
-  // A missing watermark should not cost the printer the whole card.
-  const mark = cfg.watermark && loaded.get(cfg.watermark.src)
-  if (mark) {
-    drawContained(ctx, mark, {
-      canvasWidth: width,
-      canvasHeight: height,
-      widthFraction: cfg.watermark.scale,
-      x: cfg.watermark.x,
-      y: cfg.watermark.y,
-      opacity: cfg.watermark.opacity,
-      crop: cfg.watermark.crop
-    })
-  }
-
-  const name = (person.name || '').trim() || 'Voornaam Familienaam'
-  const twoLine = cfg.nameLines === 2 && name.includes(' ')
-
-  ctx.fillStyle = cfg.frontText
-  ctx.font = `${TYPE.name.weight} ${px(TYPE.name.size)}px ${cfg.nameFont === 'serif' ? FONTS.serif : FONTS.sans}`
-
-  if (twoLine) {
-    const cut = name.lastIndexOf(' ')
-    ctx.fillText(name.slice(0, cut), left, atY(TYPE.name.y))
-    ctx.fillText(name.slice(cut + 1), left, atY(TYPE.nameLine2.y))
-  } else {
-    ctx.fillText(name, left, atY(TYPE.name.y))
-  }
-
-  const job = (person.job || '').trim()
-  if (job) {
-    ctx.fillStyle = cfg.frontMuted
-    ctx.font = `${TYPE.job.weight} ${px(TYPE.job.size)}px ${FONTS.sans}`
-    ctx.fillText(job, left, atY(twoLine ? TYPE.jobTwoLine.y : TYPE.job.y))
-  }
-
-  ctx.fillStyle = cfg.frontText
-  ctx.font = `${TYPE.contact.weight} ${px(TYPE.contact.size)}px ${FONTS.sans}`
-
-  let contactY = twoLine ? TYPE.contactTwoLine.y : TYPE.contact.y
-  for (const line of [person.phone, person.email].map((v) => (v || '').trim()).filter(Boolean)) {
-    ctx.fillText(line, left, atY(contactY))
-    contactY += TYPE.contact.lineHeight
-  }
-
-  ctx.fillStyle = cfg.frontMuted
-  ctx.font = `${TYPE.footer.weight} ${px(TYPE.footer.size)}px ${FONTS.sans}`
-  ctx.fillText(company.websiteUrl.replace(/^https?:\/\//i, ''), left, atY(TYPE.footer.y))
-  ctx.fillText(company.address, left, atY(TYPE.footer.y + TYPE.footer.lineHeight))
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
 }
 
 /** Exports a rendered canvas as a JPEG blob. Print wants no alpha channel. */

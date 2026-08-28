@@ -119,8 +119,8 @@ const props = defineProps({
 })
 
 const SIDES = [
-    { id: 'front', label: 'Voorkant' },
-    { id: 'back', label: 'Achterkant' }
+    { id: 'front', label: 'Voorkant — logo' },
+    { id: 'back', label: 'Achterkant — jouw gegevens' }
 ]
 
 // The preview only has to look right on screen; rendering it at full 300 dpi
@@ -145,7 +145,13 @@ const guideStyle = computed(() => {
     return { inset: `${insetY}% ${insetX}%` }
 })
 
+// Canvas draws with whatever is loaded at that moment, so a render started
+// before the webfonts arrive silently uses the fallback stack.
+const fontsReady = () => (document.fonts ? document.fonts.ready : Promise.resolve())
+
 const drawPreviews = async () => {
+    await fontsReady()
+
     for (const side of SIDES) {
         try {
             await renderCard(canvases[side.id], {
@@ -163,6 +169,7 @@ const drawPreviews = async () => {
 
 /** Renders one side at full print resolution on an off-screen canvas. */
 const renderForPrint = async (side) => {
+    await fontsReady()
     const canvas = document.createElement('canvas')
     await renderCard(canvas, { side, company: company.value, person: person.value, assetUrl })
     return canvas

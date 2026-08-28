@@ -9,6 +9,8 @@
 // resolves them against the absolute ASSET_BASE, because those URLs have to
 // keep working inside somebody else's mailbox.
 
+import { FONT_STACKS } from './business-card.js'
+
 export const COMPANIES = {
   md: {
     id: 'md',
@@ -51,26 +53,61 @@ export const COMPANIES = {
     instagramUrl: 'https://www.instagram.com/mdbouw_altijdconstructief/',
     linkedinUrl: 'www.linkedin.com/company/md-bouw',
 
-    // Business card. Colors read off the approved reference cards; the front
-    // watermark is the regular logo drawn very faintly and cropped by the card
-    // edge, which is why scale is larger than 1.
+    // Business card. Every number is a design unit from the Figma artboard
+    // (1200 x 776.47 = the trim area); see business-card.js.
     card: {
-      frontBg: '#FDF9F3',
-      frontText: '#17313C',
-      frontMuted: '#5C6B73',
-      nameFont: 'sans',
-      backBg: '#17313C',
-      backLogo: 'assets/logos/logo-md-white.png',
-      backLogoScale: 0.42,
-      tagline: '',
-      watermark: {
-        src: 'assets/logos/logo-md-primair.png',
-        // Only the circle mark; the file also carries the wordmark below it.
-        crop: { x: 0.32, y: 0.01, w: 0.36, h: 0.51 },
-        opacity: 0.05,
-        scale: 0.78,
-        x: 0.74,
-        y: 0.46
+      front: {
+        bg: '#17313C',
+        // Only the circle mark exists as a white asset; the wordmark and
+        // baseline below it are set from the spec's boxes.
+        logo: 'assets/logos/logo-md-white.png',
+        logoWidth: 129.19,
+        logoCx: 600,
+        logoCy: 327.13,
+        lockup: [
+          {
+            text: 'MD BOUW',
+            family: FONT_STACKS.workSans,
+            weight: 600,
+            size: 47.74,
+            lineHeight: 47.74,
+            top: 421.87,
+            targetWidth: 365.04,
+            color: '#FFFFFF'
+          },
+          {
+            text: 'altijd constructief',
+            family: FONT_STACKS.workSans,
+            weight: 400,
+            size: 28,
+            lineHeight: 28.81,
+            top: 485.11,
+            targetWidth: 243.88,
+            color: '#FFFFFF'
+          }
+        ]
+      },
+      back: {
+        bg: '#FFFAF6',
+        color: '#17313C',
+        x: 85,
+        y: { name: 85, job: 137, phone: 218, email: 259, website: 631.47, address: 661.47 },
+        type: {
+          name: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 48 },
+          job: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 },
+          contact: { family: FONT_STACKS.sourceSans, size: 32, lineHeight: 40 },
+          footer: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 }
+        },
+        watermark: {
+          src: 'assets/logos/logo-md-primair.png',
+          // The file also carries the wordmark; the card wants only the circle.
+          crop: { x: 0.32, y: 0.01, w: 0.36, h: 0.51 },
+          x: 460,
+          y: 85,
+          width: 904.7,
+          height: 904.73,
+          opacity: 0.05
+        }
       }
     },
     overlays: [
@@ -115,15 +152,42 @@ export const COMPANIES = {
     linkedinUrl: '',
 
     card: {
-      frontBg: '#FFFBF6',
-      frontText: '#3F4A44',
-      frontMuted: '#6B736E',
-      nameFont: 'serif',
-      backBg: '#4E5A54',
-      backLogo: 'assets/logos/logo-cf-white.png',
-      backLogoScale: 0.34,
-      tagline: 'waar wonen toekomst krijgt',
-      watermark: { src: 'assets/logos/logo-cf.png', opacity: 0.1, scale: 0.3, x: 0.84, y: 0.55 }
+      front: {
+        bg: '#4E5A54',
+        logo: 'assets/logos/logo-cf-white.png',
+        logoWidth: 351.91,
+        logoCx: 600,
+        logoCy: 388.235,
+        tagline: {
+          text: 'waar wonen toekomst krijgt',
+          family: FONT_STACKS.lato,
+          size: 28,
+          lineHeight: 34,
+          top: 700,
+          color: '#FFFAF6',
+          opacity: 0.75
+        }
+      },
+      back: {
+        bg: '#FFFAF6',
+        color: '#4E5A54',
+        x: 85,
+        y: { name: 85, job: 137, phone: 218, email: 256, website: 633.47, address: 662.47 },
+        type: {
+          name: { family: FONT_STACKS.baskerville, weight: 600, size: 48, lineHeight: 48 },
+          job: { family: FONT_STACKS.lato, size: 24, lineHeight: 29 },
+          contact: { family: FONT_STACKS.lato, size: 32, lineHeight: 38 },
+          footer: { family: FONT_STACKS.lato, size: 24, lineHeight: 29 }
+        },
+        // The monogram is three outlined rectangles rather than a bitmap.
+        outlineColor: '#E8E6E3',
+        outlineWidth: 13.153,
+        outlines: [
+          { x: 959.52, y: 307.48, w: 155.52, h: 383.96 },
+          { x: 959.52, y: 307.48, w: 155.52, h: 244.42 },
+          { x: 1037.28, y: 443.67, w: 77.76, h: 247.77 }
+        ]
+      }
     },
     overlays: [
       { id: 'full-cf', src: 'assets/overlays/full-cf.png', label: 'Volledig' },
@@ -168,22 +232,34 @@ export const COMPANIES = {
     linkedinUrl: '',
 
     card: {
-      frontBg: '#FFFBF6',
-      frontText: '#0A395C',
-      frontMuted: '#4A6076',
-      nameFont: 'sans',
-      backBg: '#0A395C',
-      backLogo: 'assets/logos/logo-ge-white.png',
-      backLogoScale: 0.42,
-      tagline: '',
-      watermark: {
-        src: 'assets/logos/logo-ge.png',
-        // The 'G' mark at the far left of the wordmark file.
-        crop: { x: 0, y: 0, w: 0.155, h: 0.72 },
-        opacity: 0.06,
-        scale: 0.26,
-        x: 0.76,
-        y: 0.5
+      front: {
+        bg: '#0B395C',
+        logo: 'assets/logos/logo-ge-white.png',
+        logoWidth: 500,
+        logoCx: 600,
+        logoCy: 388.235
+      },
+      back: {
+        bg: '#FFFAF6',
+        color: '#0B395C',
+        x: 85,
+        y: { name: 97.235, job: 149.235, phone: 231.235, email: 271.235, website: 619.235, address: 649.235 },
+        type: {
+          name: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 48 },
+          job: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 },
+          contact: { family: FONT_STACKS.sourceSans, size: 32, lineHeight: 40 },
+          footer: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 }
+        },
+        watermark: {
+          src: 'assets/logos/logo-ge.png',
+          // The 'G' mark at the far left of the wordmark file.
+          crop: { x: 0, y: 0, w: 0.155, h: 0.72 },
+          x: 694,
+          y: 188,
+          width: 400,
+          height: 400,
+          opacity: 0.04
+        }
       }
     },
     overlays: [
@@ -229,20 +305,38 @@ export const COMPANIES = {
     linkedinUrl: '',
 
     card: {
-      frontBg: '#FFFFFF',
-      frontText: '#111111',
-      frontMuted: '#4A4A4A',
-      nameFont: 'sans',
-      // HVM's reference card carries a cream diagonal out of the top-right
-      // corner instead of a centred mark.
-      accentShape: { color: '#FEF6EE' },
-      // The reference card breaks the name over two lines.
-      nameLines: 2,
-      backBg: '#B90000',
-      backLogo: 'assets/logos/logo-hvm-white.png',
-      backLogoScale: 0.30,
-      tagline: 'vakwerk tot in de nok',
-      watermark: { src: 'assets/logos/logo-hvm.png', opacity: 0.05, scale: 0.34, x: 0.5, y: 0.82 }
+      front: {
+        bg: '#B90000',
+        logo: 'assets/logos/logo-hvm-white.png',
+        logoWidth: 332,
+        logoCx: 600,
+        logoCy: 388.235,
+        tagline: {
+          text: 'vakwerk tot in de nok',
+          family: FONT_STACKS.workSans,
+          size: 31.5,
+          lineHeight: 37,
+          top: 699,
+          color: '#FFFFFF',
+          opacity: 0.75
+        }
+      },
+      back: {
+        bg: '#FFFFFF',
+        color: '#000000',
+        x: 85,
+        nameLines: 2,
+        y: { name: 81.235, job: 177.235, phone: 259.235, email: 299.235, website: 635.235, address: 665.235 },
+        type: {
+          name: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 48 },
+          job: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 },
+          contact: { family: FONT_STACKS.sourceSans, size: 32, lineHeight: 40 },
+          footer: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 }
+        },
+        // White card with a cream wedge left showing in the top-right corner.
+        wedgeColor: '#FFFAF6',
+        wedge: { x: 600, y: 600 }
+      }
     },
     overlays: [
       { id: 'full-hvm', src: 'assets/overlays/full-hvm.png', label: 'Volledig' },

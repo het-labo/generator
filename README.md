@@ -105,20 +105,27 @@ Resultaat: `company-html/*.html` (~470 KB per stuk sinds shadcn-vue). Afbeelding
 ## Visitekaartjes
 
 `app/utils/business-card.js` tekent beide zijden op canvas en exporteert JPG.
-De print-geometrie staat bovenaan dat bestand en is niet vrijblijvend:
+
+**Coördinaten zijn Figma-eenheden, geen pixels of millimeters.** Het artboard
+is 1200 × 776,47 en dát is het snijformaat; de canvas wordt één keer geschaald.
+Waarden uit de Figma-CSS kunnen dus rechtstreeks in `COMPANIES[..].card`.
 
 | | |
 | --- | --- |
-| Snijformaat | 85 × 55 mm (Europese standaard) |
+| Snijformaat | 85 × 55 mm = 1200 × 776,47 designeenheden |
 | Afloop | 3 mm rondom → 91 × 61 mm |
 | Resolutie | 300 dpi → 1075 × 720 px |
 | Kleurruimte | sRGB — browsers exporteren geen CMYK |
 
-Per bedrijf staat de vormgeving in `COMPANIES[..].card`: achtergrond- en
-tekstkleuren, het lettertype van de naam, het logo voor de achterkant, en het
-watermerk op de voorkant met een optionele `crop` (de logobestanden bevatten
-zowel een beeldmerk als een woordmerk; de kaart wil meestal alleen het
-beeldmerk).
+`front` is de **logo-zijde**, `back` de zijde met de persoonsgegevens — zoals
+de Figma-bestanden heten.
+
+De kaarten zijn gezet in Work Sans, Source Sans 3, Lato, Libre Baskerville en
+Roboto Mono, geladen via Google Fonts in `nuxt.config.ts`. Canvas tekent met
+wat op dat moment geladen is, dus de generator wacht op `document.fonts.ready`.
+**De losse single-file builds hebben geen netwerk** en vallen terug op de
+stacks in `business-card.js`; gebruik die bestanden niet om drukwerk aan te
+leveren.
 
 De snijlijnen in het voorbeeld zijn een overlay en zitten **niet** in de
 export — de drukker krijgt schone bestanden.
