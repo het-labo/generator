@@ -53,6 +53,12 @@ export default defineNuxtConfig({
       // be relative. Override with NUXT_PUBLIC_ASSET_BASE.
       assetBase: ASSET_BASE,
 
+      // Where the app loads public/ assets from at runtime — overlays, card
+      // logos, the PDF fonts. Normally that is just baseURL, but the
+      // single-file build is opened straight from disk with baseURL './', and
+      // there are no sibling files there to resolve against.
+      assetRoot: singleFile ? `${ASSET_BASE}/` : undefined,
+
       // Gate on the company-details fields. This is a guard against accidental
       // edits, not a security control — the app is fully client-side, so the
       // value is readable in the shipped bundle. Override with

@@ -52,10 +52,12 @@
 import { computed } from 'vue'
 import { ArrowRightIcon } from '@lucide/vue'
 
-const { public: { companyId }, app: { baseURL } } = useRuntimeConfig()
+const { public: { companyId, assetRoot }, app: { baseURL } } = useRuntimeConfig()
+// assetRoot is set for the single-file build, which has no sibling files.
+const root = assetRoot || baseURL
 
 const company = computed(() => companyById(companyId))
-const asset = (path) => `${baseURL}${path}`
+const asset = (path) => `${root}${path}`
 
 useHead({
     title: () => (company.value ? `${company.value.name} — Handtekening & profielfoto` : 'Generator — Kies je bedrijf')

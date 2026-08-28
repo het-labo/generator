@@ -63,8 +63,10 @@ const props = defineProps({
 
 const activeTab = ref('signature')
 
-const { app: { baseURL } } = useRuntimeConfig()
-const asset = (path) => `${baseURL}${path}`
+const { app: { baseURL }, public: { assetRoot } } = useRuntimeConfig()
+// assetRoot is set for the single-file build, which has no sibling files.
+const root = assetRoot || baseURL
+const asset = (path) => `${root}${path}`
 
 useHead({
     title: `${props.company.name} — Handtekening & profielfoto`

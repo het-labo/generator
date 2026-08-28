@@ -127,7 +127,9 @@ const props = defineProps({
     }
 })
 
-const { app: { baseURL } } = useRuntimeConfig()
+const { app: { baseURL }, public: { assetRoot } } = useRuntimeConfig()
+// assetRoot is set for the single-file build, which has no sibling files.
+const root = assetRoot || baseURL
 
 const company = computed(() => COMPANIES[props.initialCompanyId] || COMPANIES[DEFAULT_COMPANY_ID])
 const overlays = computed(() => company.value.overlays)
@@ -145,7 +147,7 @@ const fileInput = ref(null)
 // a platform scales it back up.
 const CANVAS_SIZE = 1200
 
-const getOverlaySrc = (src) => (src.startsWith('http') ? src : `${baseURL}${src}`)
+const getOverlaySrc = (src) => (src.startsWith('http') ? src : `${root}${src}`)
 
 const loadImage = (src) =>
     new Promise((resolve, reject) => {

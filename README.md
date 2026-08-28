@@ -100,7 +100,13 @@ Zelfstandige bestanden die ook via `file://` werken — handig om door te sturen
 npm run generate:companies
 ```
 
-Resultaat: `company-html/*.html` (~650 KB per stuk; shadcn-vue en de ingesloten lettertypen). Afbeeldingen blijven van `ASSET_BASE` komen, want inline base64 zou het bestand onwerkbaar groot maken.
+Resultaat: `company-html/*.html` (~1,4 MB per stuk: shadcn-vue, de ingesloten
+lettertypen en jsPDF).
+
+Deze bestanden hebben geen buurbestanden om paden tegenaan te resolven, dus
+`assetRoot` in `nuxt.config.ts` wijst ze naar de CDN. Logo's, overlays en de
+PDF-fonts komen daar vandaan — **daarvoor is dus wél internet nodig**; de rest
+werkt offline. Afbeeldingen blijven van `ASSET_BASE` komen, want inline base64 zou het bestand onwerkbaar groot maken.
 
 ## Visitekaartjes
 
@@ -116,6 +122,25 @@ Waarden uit de Figma-CSS kunnen dus rechtstreeks in `COMPANIES[..].card`.
 | Afloop | 3 mm rondom → 91 × 61 mm |
 | Resolutie | 300 dpi → 1075 × 720 px |
 | Kleurruimte | sRGB — browsers exporteren geen CMYK |
+
+### Wat lever je aan de drukker?
+
+**De PDF.** Twee pagina's (voorkant, achterkant), tekst als vector met de
+fonts ingesloten. `app/utils/business-card-pdf.js` bouwt hem met jsPDF uit
+dezelfde designeenheden als het canvas-voorbeeld, dus scherm en drukwerk
+kunnen niet uit elkaar lopen.
+
+De JPG's zijn de uitwijkoptie. Die renderen op 600 dpi in plaats van 300,
+omdat de footer op 4,8 pt staat: op 300 dpi is dat zo'n 20 pixels hoog, precies
+waar JPEG-artefacten de letters beginnen aan te vreten.
+
+> **De typografie is klein.** Naam 9,6 pt, contactgegevens 6,4 pt, footer
+> 4,8 pt — dat volgt uit de Figma-maten. Veel drukkers hanteren 6 pt als
+> ondergrens. Overleg dit met de drukker voor de eerste oplage.
+
+jsPDF wordt pas ingeladen bij een klik op de PDF-knop (~380 KB los brok), en
+de TTF-versies van de fonts staan in `public/assets/fonts/` — gegenereerd uit
+dezelfde woff2 met `node scripts/build-pdf-fonts.mjs`.
 
 `front` is de **logo-zijde**, `back` de zijde met de persoonsgegevens — zoals
 de Figma-bestanden heten.

@@ -45,24 +45,45 @@
                         <dd class="tabular-nums">
                             {{ CARD.trimWidth + CARD.bleed * 2 }} × {{ CARD.trimHeight + CARD.bleed * 2 }} mm
                         </dd>
-                        <dt class="text-muted-foreground">Pixels</dt>
+                        <dt class="text-muted-foreground">PDF</dt>
+                        <dd>vectortekst, fonts ingesloten</dd>
+                        <dt class="text-muted-foreground">JPG</dt>
                         <dd class="tabular-nums">{{ exportSize.width }} × {{ exportSize.height }} px</dd>
                         <dt class="text-muted-foreground">Kleurruimte</dt>
                         <dd>sRGB</dd>
                     </dl>
 
                     <div class="rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-                        Browsers exporteren enkel RGB. Vraagt je drukker CMYK, lever deze JPG's dan aan met de vraag om
-                        te converteren — of laat ons een PDF-versie maken.
+                        Browsers exporteren enkel RGB. Vraagt je drukker CMYK, lever dit bestand dan aan met de vraag
+                        om te converteren.
                     </div>
 
-                    <div class="flex flex-wrap gap-2">
-                        <Button class="flex-1 gap-2" :disabled="busy" @click="downloadBoth">
-                            <DownloadIcon />
-                            Download voor- en achterkant
+                    <div class="space-y-2">
+                        <Button class="w-full gap-2" size="lg" :disabled="busy" @click="downloadPdf">
+                            <FileTextIcon />
+                            Download PDF voor de drukker
                         </Button>
-                        <Button variant="outline" :disabled="busy" @click="download('front')">Voorkant</Button>
-                        <Button variant="outline" :disabled="busy" @click="download('back')">Achterkant</Button>
+                        <p class="text-xs text-muted-foreground">
+                            Twee pagina's, tekst als vector. Dit is het bestand dat je doorstuurt.
+                        </p>
+                    </div>
+
+                    <Separator />
+
+                    <div class="space-y-2">
+                        <p class="text-xs font-medium">Losse afbeeldingen</p>
+                        <div class="flex flex-wrap gap-2">
+                            <Button variant="outline" size="sm" :disabled="busy" @click="downloadImage('front')">
+                                Voorkant JPG
+                            </Button>
+                            <Button variant="outline" size="sm" :disabled="busy" @click="downloadImage('back')">
+                                Achterkant JPG
+                            </Button>
+                        </div>
+                        <p class="text-xs text-muted-foreground">
+                            Pixels op {{ IMAGE_EXPORT_DPI }} dpi — bruikbaar voor scherm, maar op klein zetwerk
+                            minder scherp dan de PDF.
+                        </p>
                     </div>
                 </CardContent>
             </Card>
@@ -108,7 +129,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { DownloadIcon } from '@lucide/vue'
+import { DownloadIcon, FileTextIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 const props = defineProps({
@@ -127,8 +148,15 @@ const SIDES = [
 // would redraw four megapixels on every keystroke.
 const PREVIEW_DPI = 96
 
-const { app: { baseURL } } = useRuntimeConfig()
-const assetUrl = (path) => `${baseURL}${path}`
+// The JPG is the fallback for people who cannot use the PDF, so it renders at
+// double the print resolution: at 300 dpi the 4.8pt footer lands on about 20
+// pixels, which is exactly where JPEG's block artefacts start eating letters.
+const IMAGE_EXPORT_DPI = 600
+
+const { app: { baseURL }, public: { assetRoot } } = useRuntimeConfig()
+// assetRoot is set for the single-file build, which has no sibling files.
+const root = assetRoot || baseURL
+const assetUrl = (path) => `${root}${path}`
 
 const person = usePerson()
 const company = computed(() => COMPANIES[props.initialCompanyId] || COMPANIES[DEFAULT_COMPANY_ID])
@@ -137,7 +165,7 @@ const canvases = reactive({ front: null, back: null })
 const showGuides = ref(true)
 const busy = ref(false)
 
-const exportSize = computed(() => cardPixelSize(CARD.dpi))
+const exportSize = computed(() => cardPixelSize(IMAGE_EXPORT_DPI))
 
 const guideStyle = computed(() => {
     const insetX = (CARD.bleed / (CARD.trimWidth + CARD.bleed * 2)) * 100
@@ -163,16 +191,17 @@ const drawPreviews = async () => {
     }
 }
 
-/** Renders one side at full print resolution on an off-screen canvas. */
+/** Renders one side at export resolution on an off-screen canvas. */
 const renderForPrint = async (side) => {
     await ensureCardFonts()
     const canvas = document.createElement('canvas')
-    await renderCard(canvas, { side, company: company.value, person: person.value, assetUrl })
+    await renderCard(canvas, { side, company: company.value, person: person.value, assetUrl, dpi: IMAGE_EXPORT_DPI })
     return canvas
 }
 
 const fileName = (side) => {
     const who = (person.value.name || 'visitekaartje').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    if (side === 'pdf') return `${company.value.slug}-${who}-visitekaartje.pdf`
     return `${company.value.slug}-${who}-${side === 'front' ? 'voorkant' : 'achterkant'}.jpg`
 }
 
@@ -187,11 +216,11 @@ const saveBlob = (blob, name) => {
     setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }
 
-const download = async (side) => {
+const downloadImage = async (side) => {
     busy.value = true
     try {
         const canvas = await renderForPrint(side)
-        const blob = await canvasToJpeg(canvas)
+        const blob = await canvasToJpeg(canvas, 0.98)
         if (!blob) throw new Error('Kon geen JPG maken')
         saveBlob(blob, fileName(side))
         toast.success(`${side === 'front' ? 'Voorkant' : 'Achterkant'} gedownload`)
@@ -203,9 +232,18 @@ const download = async (side) => {
     }
 }
 
-const downloadBoth = async () => {
-    await download('front')
-    await download('back')
+const downloadPdf = async () => {
+    busy.value = true
+    try {
+        const blob = await buildCardPdf({ company: company.value, person: person.value, assetUrl })
+        saveBlob(blob, fileName('pdf'))
+        toast.success('PDF gedownload', { description: 'Twee pagina\u2019s: voorkant en achterkant.' })
+    } catch (err) {
+        console.error(err)
+        toast.error('PDF maken mislukt', { description: err.message })
+    } finally {
+        busy.value = false
+    }
 }
 
 onMounted(drawPreviews)
