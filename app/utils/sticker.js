@@ -33,8 +33,6 @@ const TEXT = {
   footerTop: 577
 }
 
-export { FONT_STACKS }
-
 /**
  * Applies the user's chosen sizes on top of a company's type spec.
  *
