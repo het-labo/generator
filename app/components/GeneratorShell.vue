@@ -4,6 +4,21 @@
             <header class="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
                 <div class="mx-auto flex w-full max-w-[1400px] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
                     <div class="flex min-w-0 flex-1 items-center gap-3">
+                        <!--
+                            A standalone build (NUXT_COMPANY=md) is one company at
+                            the root; there is no overview to go back to.
+                        -->
+                        <Tooltip v-if="hasOverview">
+                            <TooltipTrigger as-child>
+                                <Button variant="ghost" size="icon" class="size-8 shrink-0" as-child>
+                                    <NuxtLink to="/" aria-label="Naar het bedrijvenoverzicht">
+                                        <ArrowLeftIcon class="size-4" />
+                                    </NuxtLink>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">Ander bedrijf kiezen</TooltipContent>
+                        </Tooltip>
+
                         <img :src="asset(company.navLogo)" :alt="company.name" class="h-6 max-w-[120px] object-contain" />
                         <Separator orientation="vertical" class="hidden h-6 sm:block" />
                         <span class="hidden truncate text-sm font-semibold sm:block">{{ company.name }}</span>
@@ -59,7 +74,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { CreditCardIcon, MailIcon, StickerIcon, UserRoundIcon } from '@lucide/vue'
+import { ArrowLeftIcon, CreditCardIcon, MailIcon, StickerIcon, UserRoundIcon } from '@lucide/vue'
 
 const props = defineProps({
     company: {
@@ -70,7 +85,10 @@ const props = defineProps({
 
 const activeTab = ref('signature')
 
-const { app: { baseURL }, public: { assetRoot } } = useRuntimeConfig()
+const { app: { baseURL }, public: { assetRoot, companyId } } = useRuntimeConfig()
+
+// Only the shared build has a company picker to return to.
+const hasOverview = !companyId
 // assetRoot is set for the single-file build, which has no sibling files.
 const root = assetRoot || baseURL
 const asset = (path) => `${root}${path}`

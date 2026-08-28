@@ -12,7 +12,7 @@
                 <img :src="asset('assets/logos/logo-het-labo.svg')" alt="Het Labo" class="h-8 dark:invert" />
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">Generator</h1>
-                    <p class="text-sm text-muted-foreground">Handtekeningen en profielfoto's in de juiste huisstijl.</p>
+                    <p class="text-sm text-muted-foreground">Handtekeningen, profielfoto's, visitekaartjes en stickers in de juiste huisstijl.</p>
                 </div>
             </div>
         </header>
