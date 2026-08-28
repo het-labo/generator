@@ -1,0 +1,81 @@
+/*
+  The typefaces the business cards are set in, per the approved Figma files.
+
+  Self-hosted rather than pulled from Google Fonts, for two reasons: the
+  standalone single-file build has no network, and canvas silently falls back
+  to a system typeface when a face is unavailable — which would print the
+  wrong card without anyone noticing.
+
+  woff2 only. The legacy woff fallback that @fontsource ships doubles the
+  payload and no browser from the last decade needs it; that matters here
+  because these files are base64'd into the single-file build.
+
+  The files come from the @fontsource packages (kept as devDependencies so the
+  origin and version stay traceable) and are copied in with:
+
+    cp node_modules/@fontsource/<name>/files/<name>-latin-<weight>-normal.woff2 \
+       app/assets/fonts/<name>-<weight>.woff2
+
+  All five families are SIL Open Font License; the licences sit next to the
+  files in this directory.
+
+  NOTE: the spec asks for 'Baskerville' (a macOS system font, not
+  redistributable) and 'Source Sans Pro' (renamed upstream to Source Sans 3).
+  Libre Baskerville and Source Sans 3 are the closest licensable equivalents.
+*/
+
+@font-face {
+    font-family: 'Work Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/work-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Work Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/work-sans-600.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/source-sans-3-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/lato-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Libre Baskerville';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/libre-baskerville-400.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Libre Baskerville';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/libre-baskerville-600.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/roboto-mono-400.woff2') format('woff2');
+}

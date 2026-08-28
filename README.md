@@ -100,7 +100,7 @@ Zelfstandige bestanden die ook via `file://` werken — handig om door te sturen
 npm run generate:companies
 ```
 
-Resultaat: `company-html/*.html` (~470 KB per stuk sinds shadcn-vue). Afbeeldingen blijven van `ASSET_BASE` komen, want inline base64 zou het bestand onwerkbaar groot maken.
+Resultaat: `company-html/*.html` (~650 KB per stuk; shadcn-vue en de ingesloten lettertypen). Afbeeldingen blijven van `ASSET_BASE` komen, want inline base64 zou het bestand onwerkbaar groot maken.
 
 ## Visitekaartjes
 
@@ -120,12 +120,26 @@ Waarden uit de Figma-CSS kunnen dus rechtstreeks in `COMPANIES[..].card`.
 `front` is de **logo-zijde**, `back` de zijde met de persoonsgegevens — zoals
 de Figma-bestanden heten.
 
+### Lettertypen
+
 De kaarten zijn gezet in Work Sans, Source Sans 3, Lato, Libre Baskerville en
-Roboto Mono, geladen via Google Fonts in `nuxt.config.ts`. Canvas tekent met
-wat op dat moment geladen is, dus de generator wacht op `document.fonts.ready`.
-**De losse single-file builds hebben geen netwerk** en vallen terug op de
-stacks in `business-card.js`; gebruik die bestanden niet om drukwerk aan te
-leveren.
+Roboto Mono. Die worden **zelf gehost** vanuit `app/assets/fonts/` — zie
+`app/assets/css/fonts.css` voor de herkomst, de licenties en hoe je ze
+bijwerkt. Alleen woff2, alleen de latin-subset.
+
+Twee vervangingen ten opzichte van de Figma-spec, omdat de originelen niet
+distribueerbaar zijn: `Baskerville` (macOS-systeemfont) → **Libre
+Baskerville**, en `Source Sans Pro` → **Source Sans 3** (dezelfde familie,
+upstream hernoemd).
+
+Canvas laadt een webfont **niet** automatisch: `ctx.font` op een face die de
+pagina zelf nergens toont laat die ongeladen, en dan tekent hij stilzwijgend
+met een fallback. `ensureCardFonts()` in `business-card.js` vraagt daarom elke
+face expliciet op vóór de eerste render.
+
+In de single-file build worden de fonts als base64 ingesloten
+(`assetsInlineLimit` in `nuxt.config.ts`), dus ook die bestanden zetten de
+kaarten correct — ze werken volledig offline.
 
 De snijlijnen in het voorbeeld zijn een overlay en zitten **niet** in de
 export — de drukker krijgt schone bestanden.

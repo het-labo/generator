@@ -12,11 +12,17 @@ export default defineNuxtConfig({
 
   modules: ['shadcn-nuxt', 'nuxt-single-html'],
 
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/fonts.css', '~/assets/css/main.css'],
 
   // Tailwind v4 ships as a Vite plugin rather than a Nuxt module.
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      // The single-file build is opened straight from disk: there are no
+      // sibling files to fetch, so the fonts have to be base64'd into the CSS
+      // or the cards fall back to system typefaces.
+      assetsInlineLimit: singleFile ? 512 * 1024 : 4096
+    }
   },
 
   shadcn: {
@@ -67,19 +73,7 @@ export default defineNuxtConfig({
 
       // For true single-file output, either remove the favicon
       // or inline/import it another way. /favicon.svg is still a separate public file.
-      link: [
-        // Typefaces the business cards are set in. They are drawn onto a
-        // canvas, so they must be loaded before the first render — see
-        // BusinessCardGenerator. The standalone single-file build has no
-        // network, and falls back to the stacks in business-card.js.
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600&family=Source+Sans+3:wght@400&family=Lato:wght@400&family=Libre+Baskerville:wght@400;700&family=Roboto+Mono:wght@400&display=swap'
-        },
-        ...(singleFile ? [] : [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.svg' }])
-      ]
+      link: singleFile ? [] : [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.svg' }]
     }
   }
 })

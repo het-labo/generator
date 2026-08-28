@@ -30,14 +30,40 @@ export const cardPixelSize = (dpi = CARD.dpi) => ({
   height: MM_TO_PX(CARD.trimHeight + CARD.bleed * 2, dpi)
 })
 
-// Fallbacks matter: the standalone single-file build has no network, so the
-// webfonts are unavailable there and these stacks decide what prints.
+// The typefaces the approved cards are set in. Self-hosted via @fontsource
+// (see nuxt.config) so they also work in the offline single-file build.
 export const FONT_STACKS = {
   workSans: "'Work Sans', system-ui, sans-serif",
   sourceSans: "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif",
   lato: "'Lato', system-ui, sans-serif",
   baskerville: "'Libre Baskerville', Baskerville, Georgia, serif",
   robotoMono: "'Roboto Mono', ui-monospace, monospace"
+}
+
+// Canvas does NOT trigger a webfont to load: setting ctx.font on a face the
+// document never rendered leaves it unloaded, and the card silently draws in
+// the fallback. Each face therefore has to be requested explicitly before the
+// first render. Sizes here are irrelevant — only family, weight and style are
+// matched.
+const CARD_FONT_FACES = [
+  "400 32px 'Work Sans'",
+  "600 48px 'Work Sans'",
+  "400 32px 'Source Sans 3'",
+  "400 32px 'Lato'",
+  "600 48px 'Libre Baskerville'",
+  "400 32px 'Roboto Mono'"
+]
+
+/** Resolves once every card typeface is actually available to canvas. */
+export const ensureCardFonts = async () => {
+  if (typeof document === 'undefined' || !document.fonts) return
+
+  await Promise.all(
+    CARD_FONT_FACES.map((face) =>
+      document.fonts.load(face).catch((err) => console.error(`Font niet geladen: ${face}`, err))
+    )
+  )
+  await document.fonts.ready
 }
 
 const imageCache = new Map()

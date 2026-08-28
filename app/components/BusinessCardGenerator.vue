@@ -145,12 +145,8 @@ const guideStyle = computed(() => {
     return { inset: `${insetY}% ${insetX}%` }
 })
 
-// Canvas draws with whatever is loaded at that moment, so a render started
-// before the webfonts arrive silently uses the fallback stack.
-const fontsReady = () => (document.fonts ? document.fonts.ready : Promise.resolve())
-
 const drawPreviews = async () => {
-    await fontsReady()
+    await ensureCardFonts()
 
     for (const side of SIDES) {
         try {
@@ -169,7 +165,7 @@ const drawPreviews = async () => {
 
 /** Renders one side at full print resolution on an off-screen canvas. */
 const renderForPrint = async (side) => {
-    await fontsReady()
+    await ensureCardFonts()
     const canvas = document.createElement('canvas')
     await renderCard(canvas, { side, company: company.value, person: person.value, assetUrl })
     return canvas
