@@ -10,6 +10,7 @@
 // (1200 x 776.47 = the trim area), converted once to millimetres.
 
 import { CARD, DESIGN } from './business-card.js'
+import { formatPhoneNumber } from './phone.js'
 import { PDF_FAMILY, PDF_FONTS, fetchPdfFont, imageToCanvas, loadPdfImage } from './pdf-shared.js'
 
 /** design units -> millimetres */
@@ -126,7 +127,7 @@ const drawBack = (doc, { card, company, person, images, offset }) => {
   }
 
   text(doc, (person.job || '').trim(), { ...type.job, x, color, top: spec.y.job }, offset)
-  text(doc, (person.phone || '').trim(), { ...type.contact, x, color, top: spec.y.phone }, offset)
+  text(doc, formatPhoneNumber((person.phone || '').trim()), { ...type.contact, x, color, top: spec.y.phone }, offset)
   text(doc, (person.email || '').trim(), { ...type.contact, x, color, top: spec.y.email }, offset)
   text(doc, company.websiteUrl.replace(/^https?:\/\//i, ''), { ...type.footer, x, color, top: spec.y.website }, offset)
   text(doc, company.address, { ...type.footer, x, color, top: spec.y.address }, offset)

@@ -11,6 +11,7 @@
 // outside the component.
 
 import { ASSET_BASE } from '../../scripts/shared.mjs'
+import { formatPhoneNumber } from './phone.js'
 
 // WIDTH: fixed at 580px, not fluid. A percentage width stretches to the full
 // compose window under Word's engine, which is why it was pinned here in the
@@ -92,18 +93,7 @@ export const companyFormDefaults = (company) => ({
   linkedinUrl: stripScheme(company.linkedinUrl)
 })
 
-/** Formats a Belgian phone number to "+32 xxx xx xx xx"; returns input untouched otherwise. */
-export const formatPhoneNumber = (phone) => {
-  if (!phone) return ''
-  const digits = phone.replace(/\D/g, '')
-  if (digits.length === 10 && digits.startsWith('04')) {
-    return '+32 ' + digits.substring(1).replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4')
-  }
-  if (digits.length === 10) {
-    return digits.replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4')
-  }
-  return phone
-}
+
 
 export const buildSignatureHtml = ({ company, form, photo = '', assetBase = ASSET_BASE }) => {
   const name = form.name || 'Voornaam Familienaam'

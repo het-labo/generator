@@ -13,6 +13,8 @@
 // SIDES: 'front' is the logo side, 'back' is the side carrying the person's
 // details — matching how the approved Figma files are named.
 
+import { formatPhoneNumber } from './phone.js'
+
 export const CARD = {
   trimWidth: 85,
   trimHeight: 55,
@@ -218,7 +220,7 @@ const drawBack = (ctx, { card, company, person, images }) => {
   }
 
   drawText(ctx, (person.job || '').trim(), { ...type.job, x, color, top: spec.y.job })
-  drawText(ctx, (person.phone || '').trim(), { ...type.contact, x, color, top: spec.y.phone })
+  drawText(ctx, formatPhoneNumber((person.phone || '').trim()), { ...type.contact, x, color, top: spec.y.phone })
   drawText(ctx, (person.email || '').trim(), { ...type.contact, x, color, top: spec.y.email })
 
   drawText(ctx, company.websiteUrl.replace(/^https?:\/\//i, ''), {
