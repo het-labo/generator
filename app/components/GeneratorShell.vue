@@ -2,7 +2,15 @@
     <div class="flex min-h-screen flex-col">
         <Tabs v-model="activeTab" class="flex flex-1 flex-col gap-0">
             <header class="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
-                <div class="mx-auto flex w-full max-w-[1400px] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+                <!--
+                    Below lg the header is two rows: identity on top, tabs under
+                    it. On one row the tabs need about 800px next to the logo,
+                    so before that they pushed the logo out of the header
+                    entirely and ran off the right edge of a phone.
+                -->
+                <div
+                    class="mx-auto flex w-full max-w-[1400px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6 lg:flex-nowrap lg:px-8"
+                >
                     <div class="flex min-w-0 flex-1 items-center gap-3">
                         <!--
                             A standalone build (NUXT_COMPANY=md) is one company at
@@ -19,27 +27,31 @@
                             <TooltipContent side="bottom">Ander bedrijf kiezen</TooltipContent>
                         </Tooltip>
 
-                        <img :src="asset(company.navLogo)" :alt="company.name" class="h-6 max-w-[120px] object-contain" />
+                        <img
+                            :src="asset(company.navLogo)"
+                            :alt="company.name"
+                            class="h-6 max-w-[120px] shrink-0 object-contain"
+                        />
                         <Separator orientation="vertical" class="hidden h-6 sm:block" />
                         <span class="hidden truncate text-sm font-semibold sm:block">{{ company.name }}</span>
                     </div>
 
-                    <TabsList>
-                        <TabsTrigger value="signature" class="gap-1.5">
-                            <MailIcon class="size-3.5" />
-                            Handtekening
+                    <TabsList class="w-full lg:w-fit">
+                        <TabsTrigger value="signature" class="gap-0 min-[520px]:gap-1.5">
+                            <MailIcon class="size-4 min-[520px]:size-3.5" />
+                            <span class="sr-only min-[520px]:not-sr-only">Handtekening</span>
                         </TabsTrigger>
-                        <TabsTrigger value="profile" class="gap-1.5">
-                            <UserRoundIcon class="size-3.5" />
-                            Profielfoto
+                        <TabsTrigger value="profile" class="gap-0 min-[520px]:gap-1.5">
+                            <UserRoundIcon class="size-4 min-[520px]:size-3.5" />
+                            <span class="sr-only min-[520px]:not-sr-only">Profielfoto</span>
                         </TabsTrigger>
-                        <TabsTrigger value="card" class="gap-1.5">
-                            <CreditCardIcon class="size-3.5" />
-                            Visitekaartje
+                        <TabsTrigger value="card" class="gap-0 min-[520px]:gap-1.5">
+                            <CreditCardIcon class="size-4 min-[520px]:size-3.5" />
+                            <span class="sr-only min-[520px]:not-sr-only">Visitekaartje</span>
                         </TabsTrigger>
-                        <TabsTrigger value="sticker" class="gap-1.5">
-                            <StickerIcon class="size-3.5" />
-                            Sticker
+                        <TabsTrigger value="sticker" class="gap-0 min-[520px]:gap-1.5">
+                            <StickerIcon class="size-4 min-[520px]:size-3.5" />
+                            <span class="sr-only min-[520px]:not-sr-only">Sticker</span>
                         </TabsTrigger>
                     </TabsList>
 
