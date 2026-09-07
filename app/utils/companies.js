@@ -294,7 +294,9 @@ export const COMPANIES = {
     colorPrimary: '#B90000',
     colorSecondary: '#190A0A',
 
-    websiteUrl: 'https://www.dakwerkenhvm.be',
+    // Without the www: that host has no DNS record at all, so the link in
+    // every signature failed. This one resolves and redirects to the site.
+    websiteUrl: 'https://dakwerkenhvm.be',
     emailPlaceholder: 'john@dakwerkenhvm.be',
     address: 'Brulens 28B — 2275 Gierle',
     addressUrl:
