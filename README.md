@@ -95,6 +95,11 @@ FTP_REMOTE_ROOT=/public_html/tools/e-mail-handtekening/
 BASE_PATH=/tools/e-mail-handtekening/
 ```
 
+Biedt een account SFTP, zet er dan `FTP_SFTP=true` bij. De sleutel doet dan
+het werk en er gaat geen wachtwoord meer over de lijn; standaard wordt
+`~/.ssh/id_ed25519` gebruikt, of `FTP_PRIVATE_KEY` als hij elders staat. Zonder
+die vlag blijft het gewone FTP — dat verschilt per hostingaccount.
+
 `BASE_PATH` is het pad waaronder de tool draait. Dat moet bij het **bouwen**
 bekend zijn, want de asset-paden zitten in de build gebakken — je kunt een
 build voor de root niet in een submap zetten. Het moet overeenkomen met het

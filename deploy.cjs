@@ -2,15 +2,23 @@
 require('dotenv').config({ path: process.env.DOTENV_CONFIG_PATH || undefined })
 const FtpDeploy = require('ftp-deploy')
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 
 const localRoot = path.join(__dirname, '.output/public')
+
+// Some hosting accounts offer SFTP, others only plain FTP, so the transport is
+// per company. With SFTP the key does the authenticating and no password
+// crosses the network; plain FTP sends it in the clear on every upload.
+const useSftp = /^(1|true|yes)$/i.test(process.env.FTP_SFTP || '')
+const keyFile = process.env.FTP_PRIVATE_KEY || path.join(os.homedir(), '.ssh/id_ed25519')
 
 const config = {
   user: process.env.FTP_USER,
   password: process.env.FTP_PASSWORD,
   host: process.env.FTP_HOST,
-  port: Number(process.env.FTP_PORT) || 21,
+  port: Number(process.env.FTP_PORT) || (useSftp ? 22 : 21),
+  sftp: useSftp,
   localRoot,
   remoteRoot: process.env.FTP_REMOTE_ROOT || '/subsites/library.het-labo.be/generator/',
   include: ['*', '**/*', '**/.*'],
@@ -25,8 +33,16 @@ const fail = (message, detail) => {
   process.exit(1)
 }
 
-for (const key of ['FTP_HOST', 'FTP_USER', 'FTP_PASSWORD']) {
+for (const key of useSftp ? ['FTP_HOST', 'FTP_USER'] : ['FTP_HOST', 'FTP_USER', 'FTP_PASSWORD']) {
   if (!process.env[key]) fail(`${key} ontbreekt. Vul .env aan.`)
+}
+
+if (useSftp) {
+  if (!fs.existsSync(keyFile)) {
+    fail(`Private sleutel niet gevonden: ${keyFile}`, 'Zet FTP_PRIVATE_KEY in .env als hij ergens anders staat.')
+  }
+  config.privateKey = fs.readFileSync(keyFile)
+  delete config.password
 }
 
 if (!fs.existsSync(path.join(localRoot, 'index.html'))) {
@@ -62,7 +78,7 @@ if (buildBase === '/' && remote.replace(/\/$/, '').split('/').filter(Boolean).le
   )
 }
 
-console.log(`Deployen naar ${config.host}${config.remoteRoot}`)
+console.log(`Deployen naar ${config.host}${config.remoteRoot} via ${useSftp ? 'SFTP' : 'FTP'}`)
 
 new FtpDeploy()
   .deploy(config)
@@ -71,10 +87,9 @@ new FtpDeploy()
     // Without this the process exits 0 and `npm run shipit` reports success
     // while nothing was uploaded.
     const hint =
-      err && err.code === 'ECONNREFUSED'
-        ? '\nDe server weigert de verbinding op poort ' +
-          config.port +
-          '. Staat plain FTP nog aan bij de host, of is het intussen FTPS/SFTP geworden?'
+      err && (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT')
+        ? `\nGeen verbinding op poort ${config.port}. Bij SFTP: klopt de host, en is je IP vrijgegeven in het ` +
+          'hostingpaneel? Combell filtert SSH standaard af.'
         : err && /login|530|authentication/i.test(String(err.message || err))
           ? '\nDe inloggegevens worden geweigerd. Controleer FTP_USER en FTP_PASSWORD in .env.'
           : ''
