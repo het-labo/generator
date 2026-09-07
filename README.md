@@ -57,6 +57,12 @@ Er is een regressietest die de exacte output per bedrijf vastlegt:
 npm run check
 ```
 
+De tabel staat bewust op een **vaste breedte van 580px**. Een percentage rekt
+onder Word's engine uit over het hele opstelvenster; de vloeiende variant met
+een MSO ghost-table is de gangbare oplossing daarvoor, maar viel af omdat er
+geen Windows-machine is om hem tegen te testen. Zie de comment bovenaan
+`signature.js`.
+
 Is een verschil bedoeld? **Plak het resultaat eerst echt in Outlook**, en pas dan:
 
 ```bash

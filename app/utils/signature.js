@@ -12,6 +12,15 @@
 
 import { ASSET_BASE } from '../../scripts/shared.mjs'
 
+// WIDTH: fixed at 580px, not fluid. A percentage width stretches to the full
+// compose window under Word's engine, which is why it was pinned here in the
+// first place. The fluid-plus-MSO-ghost-table version that replaces it in most
+// e-mail templates could not be verified against Outlook on Windows, and
+// getting it wrong breaks every signature in the client that matters most. The
+// cost of staying fixed is a validator warning about horizontal scrolling on
+// phones. max-width and height:auto on the banner are kept: Word ignores both,
+// so they cannot affect Outlook, and they help the image scale elsewhere.
+
 // An explicit white background rather than transparent: a dark-mode client
 // leaves the signature's own dark text and brand-coloured icons alone, and
 // both disappear against a dark backdrop. Carrying its own background keeps
@@ -213,7 +222,7 @@ export const buildSignatureHtml = ({ company, form, photo = '', assetBase = ASSE
   const bannerUrl = (form.bannerUrl || '').trim()
   const finalBannerUrl = bannerUrl ? 'https://' + bannerUrl : ''
   const bannerImgSrc = `${assetBase}/${company.banner}`
-  const bannerImgHtml = `<img width="580" alt="${company.name}" style="display:block;width:100%;max-width:580px;height:auto;border:0;" src="${bannerImgSrc}">`
+  const bannerImgHtml = `<img width="580" alt="${company.name}" style="display:block;width:580px;max-width:100%;height:auto;border:0;" src="${bannerImgSrc}">`
 
   const bannerHtml = company.banner ? `
       <tr>
@@ -229,8 +238,7 @@ export const buildSignatureHtml = ({ company, form, photo = '', assetBase = ASSE
   // width:100%/max-width — Word ignores max-width, so a percentage table
   // stretched to the full compose-window width in Outlook.
   return minify(`
-    <!--[if mso]><table cellpadding="0" cellspacing="0" border="0" width="580" style="width:580px;"><tr><td><![endif]-->
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; ${FONT_STACK} background-color:#ffffff; width:100%; max-width:580px; text-align: left;">
+    <table cellpadding="0" cellspacing="0" border="0" width="580" style="border-collapse:collapse; ${FONT_STACK} background-color:#ffffff; width:580px; text-align: left;">
       <tr>
         ${photo ? `<td width="76" style="padding:10px 0px 10px 0px; vertical-align:top; width:76px;">
           <img src="${photo}" alt="${name}" width="66" height="66" style="display:block; width:66px; height:66px; max-height:66px; max-width:66px; border-radius:50%; border:0;">
@@ -249,7 +257,7 @@ export const buildSignatureHtml = ({ company, form, photo = '', assetBase = ASSE
                 <img src="${assetBase}/${company.logo}" alt="${company.name}" ${logoWidthAttr ? `width="${logoWidthAttr}"` : ''} ${logoHeightAttr ? `height="${logoHeightAttr}"` : ''} style="display:block; width:auto; height:${company.logoHeight}; border:0; max-width:${company.logoWidth};">
               </td>
               <td style="vertical-align:middle; padding-left:16px;">
-                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; width:100%; max-width:500px;">
+                <table cellpadding="0" cellspacing="0" border="0" width="500" style="border-collapse:collapse; width:500px; max-width:500px;">
                   <tr>
                     <td style="${FONT_STACK}font-size:12px; line-height:18px; color:${footerTextColor};">
                       ${footerHtml}
@@ -262,7 +270,6 @@ export const buildSignatureHtml = ({ company, form, photo = '', assetBase = ASSE
         </td>
       </tr>
       ${bannerHtml}
-    </table>
-    <!--[if mso]></td></tr></table><![endif]-->`)
+    </table>`)
 }
 

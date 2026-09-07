@@ -3,16 +3,17 @@
 Openstaande punten uit de code-analyse van 28-08-2026. Alles hier vraagt een
 beslissing van jullie kant — het is bewust níet stilzwijgend "opgelost".
 
-## Eerst verifiëren — blokkeert deploy
+## Afgesloten beslissingen
 
-- [ ] **Plak één handtekening in Outlook (Windows).** De vaste breedte van
-      580px is vervangen door een vloeiende tabel met een MSO ghost-table, zodat
-      hij op mobiel niet meer horizontaal scrollt. Outlook hoort via het
-      conditionele commentaar nog steeds 580px te krijgen. Dat is gemeten op
-      375/600/900px in de browser, maar **niet** in echte Outlook — en juist
-      daar ging het eerder mis. Klopt het niet: haal de twee `<!--[if mso]>`
-      regels in `app/utils/signature.js` weg en zet de tabel terug op
-      `width="580"`.
+- [x] **Vaste breedte van 580px behouden.** De vloeiende variant met MSO
+      ghost-table loste de mobiele scroll-waarschuwing van de validator op,
+      maar was niet te testen tegen Outlook op Windows — en die route is precies
+      waar het eerder misging. Bij een fout breekt élke handtekening in de
+      belangrijkste client, tegenover een waarschuwing over horizontaal
+      scrollen op telefoons. Teruggezet op de bewezen geometrie. Krijg je ooit
+      toegang tot een Windows-machine, dan is het de moeite om alsnog te
+      testen: de ghost-table staat beschreven in de comment bovenaan
+      `signature.js`.
 
 ## Beslissen
 

@@ -12,7 +12,13 @@ export default defineNuxtConfig({
 
   modules: ['shadcn-nuxt', 'nuxt-single-html'],
 
-  css: ['~/assets/css/fonts.css', '~/assets/css/main.css'],
+  css: [
+    '~/assets/css/fonts.css',
+    // Without this the toasts render unstyled at the bottom of the document
+    // instead of floating over the page.
+    'vue-sonner/style.css',
+    '~/assets/css/main.css'
+  ],
 
   // Tailwind v4 ships as a Vite plugin rather than a Nuxt module.
   vite: {
