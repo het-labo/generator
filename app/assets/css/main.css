@@ -122,18 +122,3 @@
     all: revert;
 }
 
-/*
-  Simulates what a dark-mode mail client does to a signature it was never told
-  about: it lightens the dark text so it stays readable. The copied HTML holds
-  no dark variant of its own — a pasted fragment has no <head> or <style> to
-  put a prefers-color-scheme rule in, and Outlook strips <style> regardless.
-
-  !important is needed because the signature sets its colours inline, on every
-  element, to survive Word's rendering engine.
-
-  Images are left alone, exactly as those clients leave them.
-*/
-.signature-preview.is-dark,
-.signature-preview.is-dark * {
-    color: #f4f4f5 !important;
-}

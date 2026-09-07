@@ -32,15 +32,12 @@ beslissing van jullie kant — het is bewust níet stilzwijgend "opgelost".
       afbeeldingen × ~70 tekens URL. `library.het-labo.be/g/fb-md.png` in
       plaats van `/generator/assets/icons/icon_facebook_md.png` scheelt ~215
       tekens, maar vraagt hernoemen op de server.
-- [ ] **Logo en iconen verdwijnen op een donkere mailachtergrond.** De tekst
-      niet meer: het voorbeeld simuleert nu dat donkere clients die oplichten,
-      wat ze ook echt doen. Afbeeldingen laten ze ongemoeid, dus het donkere
-      logo en de brandkleurige telefoon-, mail- en social-iconen vallen weg.
-      Er zijn witte logovarianten, maar een geplakte handtekening kan niet van
-      versie wisselen — er is geen `<head>` voor een `prefers-color-scheme`
-      regel en Outlook strookt `<style>`. Reële opties: iconen met een lichte
-      omlijning, of een witte achtergrond op de logocel. Beide raken de
-      huisstijl, dus dat is jullie keuze.
+- [x] **Donkere mailachtergrond.** Opgelost door de handtekening een eigen
+      witte achtergrond te geven in plaats van transparant; tekst, logo en
+      iconen blijven zo leesbaar waar hij ook belandt. De simulatieschakelaar
+      in het voorbeeld is vervallen. Let op: enkele clients (o.a. Gmail-app,
+      Outlook.com) forceren soms alsnog hun eigen inversie — controleer dat bij
+      de Outlook-test.
 
 ## Techniek
 

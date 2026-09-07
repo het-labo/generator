@@ -12,6 +12,13 @@
 
 import { ASSET_BASE } from '../../scripts/shared.mjs'
 
+// An explicit white background rather than transparent: a dark-mode client
+// leaves the signature's own dark text and brand-coloured icons alone, and
+// both disappear against a dark backdrop. Carrying its own background keeps
+// the block readable wherever it lands. A pasted fragment cannot switch
+// colours by itself — there is no <head> for a prefers-color-scheme rule and
+// Outlook strips <style>.
+
 // Word's engine doesn't inherit font-family/size from ancestor tables into
 // cells, so this stack must be repeated inline on every text-bearing
 // element instead of relying on inheritance from the outer <table>.
@@ -223,7 +230,7 @@ export const buildSignatureHtml = ({ company, form, photo = '', assetBase = ASSE
   // stretched to the full compose-window width in Outlook.
   return minify(`
     <!--[if mso]><table cellpadding="0" cellspacing="0" border="0" width="580" style="width:580px;"><tr><td><![endif]-->
-    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; ${FONT_STACK} background-color:transparent; width:100%; max-width:580px; text-align: left;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; ${FONT_STACK} background-color:#ffffff; width:100%; max-width:580px; text-align: left;">
       <tr>
         ${photo ? `<td width="76" style="padding:10px 0px 10px 0px; vertical-align:top; width:76px;">
           <img src="${photo}" alt="${name}" width="66" height="66" style="display:block; width:66px; height:66px; max-height:66px; max-width:66px; border-radius:50%; border:0;">

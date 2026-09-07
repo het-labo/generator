@@ -16,10 +16,6 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="flex items-center gap-2">
-                    <Switch id="preview-dark" v-model="onDark" />
-                    <Label for="preview-dark" class="text-xs text-muted-foreground">Donkere mail</Label>
-                </div>
 
                 <Tooltip>
                     <TooltipTrigger as-child>
@@ -39,21 +35,18 @@
             client would. The wrapper below only simulates the viewport width and
             the client's background color.
         -->
-        <div
-            class="overflow-x-auto rounded-xl border p-4 transition-colors"
-            :class="onDark ? 'bg-zinc-900' : 'bg-white'"
-        >
+        <!--
+            Neutral backdrop rather than white: the signature carries its own
+            white background now, and on white you could not tell.
+        -->
+        <div class="overflow-x-auto rounded-xl border bg-muted/40 p-4">
             <div class="mx-auto transition-[max-width] duration-300" :style="{ maxWidth: activeWidth }">
-                <div ref="previewRef" class="signature-preview" :class="onDark && 'is-dark'" v-html="html" />
+                <div ref="previewRef" class="signature-preview" v-html="html" />
             </div>
         </div>
 
         <p class="text-xs text-muted-foreground">
             Voorbeeld op {{ width === 'mobile' ? '375px — zoals op een telefoon' : 'volle breedte — zoals op desktop' }}.
-            <span v-if="onDark">
-                De tekst wordt hier lichter gemaakt zoals een donker mailprogramma dat doet; de gekopieerde HTML bevat
-                geen aparte donkere versie.
-            </span>
         </p>
     </div>
 </template>
@@ -70,7 +63,6 @@ const WIDTHS = [
 ] as const
 
 const width = ref<'desktop' | 'mobile'>('desktop')
-const onDark = ref(false)
 const previewRef = ref<HTMLElement | null>(null)
 
 const activeWidth = computed(() => WIDTHS.find((w) => w.id === width.value)!.value)
