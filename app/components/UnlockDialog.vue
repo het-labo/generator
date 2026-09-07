@@ -1,9 +1,14 @@
 <template>
     <Dialog v-model:open="open">
         <DialogTrigger as-child>
-            <Button variant="outline" size="sm" class="gap-2">
+            <!--
+                On a narrow overlay the label plus the unbreakable card title
+                does not fit on one row, and the button was pushed off the
+                panel. sr-only rather than hidden so the button keeps its name.
+            -->
+            <Button variant="outline" size="sm" class="gap-0 min-[360px]:gap-2">
                 <component :is="locked ? LockIcon : LockOpenIcon" />
-                {{ locked ? 'Ontgrendel' : 'Vergrendel' }}
+                <span class="sr-only min-[360px]:not-sr-only">{{ locked ? 'Ontgrendel' : 'Vergrendel' }}</span>
             </Button>
         </DialogTrigger>
 

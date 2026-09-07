@@ -43,23 +43,33 @@
                 </div>
             </div>
 
-            <div ref="frameRef" class="grid gap-4 sm:grid-cols-2">
-                <figure v-for="side in SIDES" :key="side.id" class="space-y-2">
-                    <div class="relative overflow-hidden rounded-lg border bg-muted/30">
-                        <canvas :ref="(el) => (canvases[side.id] = el)" class="block w-full" />
-                        <!--
-                            Guides are an overlay, never part of the export: the
-                            printer gets clean artwork. Inset equals the bleed as
-                            a fraction of the full canvas.
-                        -->
-                        <div
-                            v-if="showGuides"
-                            class="pointer-events-none absolute border border-dashed border-red-500/70"
-                            :style="guideStyle"
-                        />
-                    </div>
-                    <figcaption class="text-xs text-muted-foreground">{{ side.label }}</figcaption>
-                </figure>
+            <!--
+                A container query, not a screen breakpoint: what decides whether
+                both sides fit next to each other is the width of this column,
+                and that depends on the sidebar as much as on the window. The
+                cap keeps a card at a readable size instead of letting it grow
+                to a hand's width on a big screen, and stops it from shrinking
+                when the second column appears.
+            -->
+            <div class="@container">
+                <div class="mx-auto grid w-full max-w-[880px] gap-4 @[880px]:grid-cols-2">
+                    <figure v-for="side in SIDES" :key="side.id" class="mx-auto w-full max-w-[432px] space-y-2">
+                        <div class="relative overflow-hidden rounded-lg border bg-muted/30">
+                            <canvas :ref="(el) => (canvases[side.id] = el)" class="block w-full" />
+                            <!--
+                                Guides are an overlay, never part of the export: the
+                                printer gets clean artwork. Inset equals the bleed as
+                                a fraction of the full canvas.
+                            -->
+                            <div
+                                v-if="showGuides"
+                                class="pointer-events-none absolute border border-dashed border-red-500/70"
+                                :style="guideStyle"
+                            />
+                        </div>
+                        <figcaption class="text-xs text-muted-foreground">{{ side.label }}</figcaption>
+                    </figure>
+                </div>
             </div>
 
             <p v-if="showGuides" class="text-xs text-muted-foreground">
@@ -125,12 +135,13 @@ const person = usePerson()
 const company = computed(() => COMPANIES[props.initialCompanyId] || COMPANIES[DEFAULT_COMPANY_ID])
 
 const canvases = reactive({ front: null, back: null })
-const frameRef = ref(null)
 
 // Rendered at the resolution the cards are actually displayed at, so the
-// preview never looks softer than the artwork really is. The two cards sit
-// side by side, hence half the frame width each.
-const { measure: measurePreviewDpi } = useCrispDpi(frameRef, (CARD.trimWidth + CARD.bleed * 2) * 2)
+// preview never looks softer than the artwork really is. Measured on one card
+// rather than on the row: the two are the same width, and whether they sit
+// side by side or stacked changes with the container.
+const cardRef = computed(() => canvases.front)
+const { measure: measurePreviewDpi } = useCrispDpi(cardRef, CARD.trimWidth + CARD.bleed * 2)
 const showGuides = ref(true)
 const busy = ref(false)
 
