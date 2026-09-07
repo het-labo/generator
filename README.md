@@ -111,6 +111,29 @@ Deze bestanden hebben geen buurbestanden om paden tegenaan te resolven, dus
 PDF-fonts komen daar vandaan — **daarvoor is dus wél internet nodig**; de rest
 werkt offline. Afbeeldingen blijven van `ASSET_BASE` komen, want inline base64 zou het bestand onwerkbaar groot maken.
 
+## Handtekening als afbeelding
+
+`app/utils/signature-image.js` rastert de handtekening naar PNG door hem in een
+SVG `<foreignObject>` te zetten en als afbeelding te laden: de browser tekent
+dat met zijn eigen layout-engine, dus het resultaat is exact het voorbeeld en
+er komt geen render-bibliotheek aan te pas.
+
+Twee dingen die de code sturen: de inhoud moet welgevormde XML zijn (vandaar
+`XMLSerializer`), en een SVG-in-een-`Image` mag géén externe bestanden laden —
+alle logo's en iconen worden dus eerst als data-URI ingebed, opgehaald van de
+eigen origin. Dat omzeilt meteen dat de CDN geen CORS-headers stuurt.
+
+> **Dit is de tweede keuze.** Voor e-mail is de HTML op het klembord beter:
+> links blijven klikbaar, tekst blijft selecteerbaar, en het blijft scherp op
+> elk scherm. Veel mailprogramma's blokkeren afbeeldingen bovendien standaard,
+> en dan ziet de ontvanger van een afbeelding-handtekening niets. Gebruik de
+> PNG alleen waar een systeem geen HTML accepteert.
+
+PNG en niet JPG: de handtekening is tekst en haarlijnen op een vlakke
+achtergrond — precies wat JPEG-blokartefacten het hardst raken. Om dezelfde
+reden levert de profielfoto ook PNG, waar het bovendien de transparante hoeken
+van de ronde uitsnede bewaart.
+
 ## Visitekaartjes
 
 `app/utils/business-card.js` tekent beide zijden op canvas en exporteert JPG.

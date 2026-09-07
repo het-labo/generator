@@ -148,6 +148,21 @@
                     HTML
                 </Button>
             </div>
+
+            <div class="space-y-2 rounded-lg border border-dashed p-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p class="text-xs font-medium">Als afbeelding</p>
+                    <Button variant="outline" size="sm" class="gap-2" :disabled="busy" @click="downloadImage">
+                        <ImageIcon class="size-3.5" />
+                        Download PNG
+                    </Button>
+                </div>
+                <p class="text-xs text-muted-foreground">
+                    Alleen gebruiken als een systeem géén HTML accepteert. In een afbeelding werken de links niet meer,
+                    en veel mailprogramma's blokkeren afbeeldingen standaard — de ontvanger ziet dan niets. Kopiëren
+                    hierboven blijft de juiste manier voor e-mail.
+                </p>
+            </div>
         </div>
         </template>
     </GeneratorLayout>
@@ -155,7 +170,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { ClipboardCheckIcon, CodeIcon } from '@lucide/vue'
+import { ClipboardCheckIcon, CodeIcon, ImageIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 const props = defineProps({
@@ -169,7 +184,10 @@ const props = defineProps({
     }
 })
 
-const { public: config } = useRuntimeConfig()
+const { public: config, app: { baseURL } } = useRuntimeConfig()
+// The image export loads assets from the app's own origin, so the canvas is
+// never tainted by the CDN (which sends no CORS headers).
+const assetUrl = (path) => `${config.assetRoot || baseURL}${path}`
 
 const LEGAL_FORMS = ['bv', 'bvba', 'nv']
 
@@ -189,6 +207,7 @@ const selectedCompanyId = ref(props.initialCompanyId)
 const comp = computed(() => COMPANIES[selectedCompanyId.value] || COMPANIES[DEFAULT_COMPANY_ID])
 
 const companyFieldsLocked = ref(true)
+const busy = ref(false)
 
 // Name/job/e-mail/phone are shared with the other generators, so filling them
 // in once is enough. Only the company block lives locally.
@@ -271,6 +290,34 @@ const copySignature = async () => {
     }
 
     toast.error('Kopiëren mislukt', { description: 'Selecteer het voorbeeld en kopieer handmatig.' })
+}
+
+// PNG rather than JPG: the signature is text and hairline rules on a flat
+// background, exactly what JPEG's block artefacts damage most.
+const downloadImage = async () => {
+    busy.value = true
+    try {
+        const { blob, width, height } = await buildSignatureImage({
+            company: comp.value,
+            form: { ...person.value, ...formData.value },
+            assetUrl
+        })
+
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        const who = (person.value.name || 'handtekening').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        link.href = url
+        link.download = `${comp.value.slug}-${who || 'handtekening'}-handtekening.png`
+        link.click()
+        setTimeout(() => URL.revokeObjectURL(url), 10_000)
+
+        toast.success('Handtekening gedownload', { description: `PNG, ${width} × ${height} px.` })
+    } catch (err) {
+        console.error(err)
+        toast.error('Afbeelding maken mislukt', { description: err.message })
+    } finally {
+        busy.value = false
+    }
 }
 
 const copyHtml = async () => {
