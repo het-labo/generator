@@ -340,6 +340,7 @@ const copyHtml = async () => {
     try {
         await navigator.clipboard.writeText(signatureHtml.value)
         markCopied('html')
+        toast.success('HTML gekopieerd', { description: 'De broncode van de handtekening staat op je klembord.' })
     } catch (err) {
         console.error('Copy failed', err)
         toast.error('Kopiëren mislukt')
