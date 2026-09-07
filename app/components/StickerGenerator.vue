@@ -64,38 +64,6 @@
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle class="flex items-center gap-2 text-base">
-                        <span class="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-bold">2</span>
-                        Drukklaar downloaden
-                    </CardTitle>
-                    <CardDescription>Eén pagina, tekst als vector.</CardDescription>
-                </CardHeader>
-                <CardContent class="space-y-4">
-                    <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                        <dt class="text-muted-foreground">Snijformaat</dt>
-                        <dd class="tabular-nums">{{ STICKER.widthMm }} × {{ STICKER.heightMm }} mm</dd>
-                        <dt class="text-muted-foreground">Met afloop</dt>
-                        <dd class="tabular-nums">
-                            {{ STICKER.widthMm + STICKER.bleed * 2 }} × {{ STICKER.heightMm + STICKER.bleed * 2 }} mm
-                        </dd>
-                        <dt class="text-muted-foreground">JPG</dt>
-                        <dd class="tabular-nums">{{ exportSize.width }} × {{ exportSize.height }} px</dd>
-                    </dl>
-
-
-                    <Button class="w-full gap-2" size="lg" :disabled="busy" @click="downloadPdf">
-                        <FileTextIcon />
-                        Download PDF voor de drukker
-                    </Button>
-
-                    <Separator />
-
-                    <Button variant="outline" size="sm" :disabled="busy" @click="downloadImage">Download JPG</Button>
-                </CardContent>
-            </Card>
-
         </template>
 
         <template #preview>
@@ -106,6 +74,29 @@
             <div ref="frameRef" class="overflow-hidden rounded-lg border bg-muted/30">
                 <canvas ref="canvasRef" class="block w-full" />
             </div>
+            <PreviewActions>
+                <template #details>
+                    <dt class="text-muted-foreground">Snijformaat</dt>
+                    <dd class="tabular-nums">{{ STICKER.widthMm }} × {{ STICKER.heightMm }} mm</dd>
+                    <dt class="text-muted-foreground">Met afloop</dt>
+                    <dd class="tabular-nums">
+                        {{ STICKER.widthMm + STICKER.bleed * 2 }} × {{ STICKER.heightMm + STICKER.bleed * 2 }} mm
+                    </dd>
+                    <dt class="text-muted-foreground">JPG</dt>
+                    <dd class="tabular-nums">{{ exportSize.width }} × {{ exportSize.height }} px</dd>
+                </template>
+
+                <Button class="flex-1 gap-2" size="lg" :disabled="busy" @click="downloadPdf">
+                    <FileTextIcon />
+                    Download PDF voor de drukker
+                </Button>
+                <Button variant="outline" size="lg" :disabled="busy" @click="downloadImage">JPG</Button>
+
+                <template #note>
+                    De PDF is het bestand dat je doorstuurt: één pagina, tekst als vector. Browsers exporteren enkel
+                    RGB — vraagt je drukker CMYK, geef dat er dan bij.
+                </template>
+            </PreviewActions>
         </div>
         </template>
     </GeneratorLayout>

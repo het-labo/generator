@@ -29,65 +29,6 @@
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle class="flex items-center gap-2 text-base">
-                        <span class="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-bold">2</span>
-                        Drukklaar downloaden
-                    </CardTitle>
-                    <CardDescription>Twee JPG's op {{ CARD.dpi }} dpi, met {{ CARD.bleed }} mm afloop.</CardDescription>
-                </CardHeader>
-                <CardContent class="space-y-4">
-                    <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                        <dt class="text-muted-foreground">Snijformaat</dt>
-                        <dd class="tabular-nums">{{ CARD.trimWidth }} × {{ CARD.trimHeight }} mm</dd>
-                        <dt class="text-muted-foreground">Met afloop</dt>
-                        <dd class="tabular-nums">
-                            {{ CARD.trimWidth + CARD.bleed * 2 }} × {{ CARD.trimHeight + CARD.bleed * 2 }} mm
-                        </dd>
-                        <dt class="text-muted-foreground">PDF</dt>
-                        <dd>vectortekst, fonts ingesloten</dd>
-                        <dt class="text-muted-foreground">JPG</dt>
-                        <dd class="tabular-nums">{{ exportSize.width }} × {{ exportSize.height }} px</dd>
-                        <dt class="text-muted-foreground">Kleurruimte</dt>
-                        <dd>sRGB</dd>
-                    </dl>
-
-                    <div class="rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-                        Browsers exporteren enkel RGB. Vraagt je drukker CMYK, lever dit bestand dan aan met de vraag
-                        om te converteren.
-                    </div>
-
-                    <div class="space-y-2">
-                        <Button class="w-full gap-2" size="lg" :disabled="busy" @click="downloadPdf">
-                            <FileTextIcon />
-                            Download PDF voor de drukker
-                        </Button>
-                        <p class="text-xs text-muted-foreground">
-                            Twee pagina's, tekst als vector. Dit is het bestand dat je doorstuurt.
-                        </p>
-                    </div>
-
-                    <Separator />
-
-                    <div class="space-y-2">
-                        <p class="text-xs font-medium">Losse afbeeldingen</p>
-                        <div class="flex flex-wrap gap-2">
-                            <Button variant="outline" size="sm" :disabled="busy" @click="downloadImage('front')">
-                                Voorkant JPG
-                            </Button>
-                            <Button variant="outline" size="sm" :disabled="busy" @click="downloadImage('back')">
-                                Achterkant JPG
-                            </Button>
-                        </div>
-                        <p class="text-xs text-muted-foreground">
-                            Pixels op {{ IMAGE_EXPORT_DPI }} dpi — bruikbaar voor scherm, maar op klein zetwerk
-                            minder scherp dan de PDF.
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
-
         </template>
 
         <template #preview>
@@ -124,6 +65,30 @@
             <p v-if="showGuides" class="text-xs text-muted-foreground">
                 De rode lijn is het snijformaat. Alles daarbuiten is afloop en wordt weggesneden.
             </p>
+            <PreviewActions>
+                <template #details>
+                    <dt class="text-muted-foreground">Snijformaat</dt>
+                    <dd class="tabular-nums">{{ CARD.trimWidth }} × {{ CARD.trimHeight }} mm</dd>
+                    <dt class="text-muted-foreground">Met afloop</dt>
+                    <dd class="tabular-nums">
+                        {{ CARD.trimWidth + CARD.bleed * 2 }} × {{ CARD.trimHeight + CARD.bleed * 2 }} mm
+                    </dd>
+                    <dt class="text-muted-foreground">JPG</dt>
+                    <dd class="tabular-nums">{{ exportSize.width }} × {{ exportSize.height }} px</dd>
+                </template>
+
+                <Button class="flex-1 gap-2" size="lg" :disabled="busy" @click="downloadPdf">
+                    <FileTextIcon />
+                    Download PDF voor de drukker
+                </Button>
+                <Button variant="outline" size="lg" :disabled="busy" @click="downloadImage('front')">Voorkant JPG</Button>
+                <Button variant="outline" size="lg" :disabled="busy" @click="downloadImage('back')">Achterkant JPG</Button>
+
+                <template #note>
+                    De PDF is het bestand dat je doorstuurt: twee pagina's, tekst als vector. Browsers exporteren
+                    enkel RGB — vraagt je drukker CMYK, geef dat er dan bij.
+                </template>
+            </PreviewActions>
         </div>
         </template>
     </GeneratorLayout>

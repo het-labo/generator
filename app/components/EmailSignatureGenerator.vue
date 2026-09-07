@@ -138,7 +138,7 @@
 
             <SignaturePreview :html="signatureHtml" />
 
-            <div class="flex flex-wrap gap-2">
+            <PreviewActions>
                 <Button class="flex-1 gap-2" size="lg" @click="copySignature">
                     <CheckIcon v-if="copied === 'signature'" />
                     <ClipboardCheckIcon v-else />
@@ -149,22 +149,17 @@
                     <CodeIcon v-else />
                     {{ copied === 'html' ? 'Gekopieerd!' : 'HTML' }}
                 </Button>
-            </div>
+                <Button variant="outline" size="lg" class="gap-2" :disabled="busy" @click="downloadImage">
+                    <ImageIcon />
+                    PNG
+                </Button>
 
-            <div class="space-y-2 rounded-lg border border-dashed p-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <p class="text-xs font-medium">Als afbeelding</p>
-                    <Button variant="outline" size="sm" class="gap-2" :disabled="busy" @click="downloadImage">
-                        <ImageIcon class="size-3.5" />
-                        Download PNG
-                    </Button>
-                </div>
-                <p class="text-xs text-muted-foreground">
-                    Alleen gebruiken als een systeem géén HTML accepteert. In een afbeelding werken de links niet meer,
-                    en veel mailprogramma's blokkeren afbeeldingen standaard — de ontvanger ziet dan niets. Kopiëren
-                    hierboven blijft de juiste manier voor e-mail.
-                </p>
-            </div>
+                <template #note>
+                    Kopiëren is de juiste manier voor e-mail. De PNG is er alleen voor systemen die geen HTML
+                    accepteren: daarin werken de links niet meer, en veel mailprogramma's blokkeren afbeeldingen
+                    standaard.
+                </template>
+            </PreviewActions>
         </div>
         </template>
     </GeneratorLayout>

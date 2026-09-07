@@ -109,10 +109,17 @@
                 </div>
             </div>
 
-            <Button class="w-full gap-2" size="lg" :disabled="!backgroundImage" @click="handleDownload">
-                <DownloadIcon />
-                Download profielfoto
-            </Button>
+            <PreviewActions>
+                <Button class="flex-1 gap-2" size="lg" :disabled="!backgroundImage" @click="handleDownload">
+                    <DownloadIcon />
+                    Download profielfoto
+                </Button>
+
+                <template #note>
+                    PNG op 1200 × 1200 px. Dat formaat houdt de transparante hoeken van de ronde uitsnede;
+                    JPG zou die zwart invullen.
+                </template>
+            </PreviewActions>
         </div>
         </template>
     </GeneratorLayout>
