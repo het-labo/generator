@@ -44,12 +44,16 @@
             :class="onDark ? 'bg-zinc-900' : 'bg-white'"
         >
             <div class="mx-auto transition-[max-width] duration-300" :style="{ maxWidth: activeWidth }">
-                <div ref="previewRef" class="signature-preview" v-html="html" />
+                <div ref="previewRef" class="signature-preview" :class="onDark && 'is-dark'" v-html="html" />
             </div>
         </div>
 
         <p class="text-xs text-muted-foreground">
             Voorbeeld op {{ width === 'mobile' ? '375px — zoals op een telefoon' : 'volle breedte — zoals op desktop' }}.
+            <span v-if="onDark">
+                De tekst wordt hier lichter gemaakt zoals een donker mailprogramma dat doet; de gekopieerde HTML bevat
+                geen aparte donkere versie.
+            </span>
         </p>
     </div>
 </template>
