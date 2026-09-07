@@ -120,8 +120,8 @@ export const COMPANIES = {
     colorPrimary: '#4E5A54',
     colorSecondary: '#190A0A',
 
-    websiteUrl: 'https://www.casafutura.com',
-    emailPlaceholder: 'john@casafutura.com',
+    websiteUrl: 'https://www.casafutura.be',
+    emailPlaceholder: 'john@casafutura.be',
     address: 'Schommestraat 7 — 2200 Herentals',
     addressUrl: '',
     vat: 'BE 0891 999 726',
