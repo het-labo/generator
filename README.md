@@ -91,8 +91,15 @@ de hostinggegevens één keer per bedrijf in `.env.<id>` — dus `.env.md`,
 FTP_HOST=ftp.mdbouw.be
 FTP_USER=…
 FTP_PASSWORD=…
-FTP_REMOTE_ROOT=/public_html/
+FTP_REMOTE_ROOT=/public_html/tools/e-mail-handtekening/
+BASE_PATH=/tools/e-mail-handtekening/
 ```
+
+`BASE_PATH` is het pad waaronder de tool draait. Dat moet bij het **bouwen**
+bekend zijn, want de asset-paden zitten in de build gebakken — je kunt een
+build voor de root niet in een submap zetten. Het moet overeenkomen met het
+einde van `FTP_REMOTE_ROOT`; laat je het weg, dan bouwt hij voor de root van
+het domein.
 
 Daarna is het per bedrijf één commando, dat bouwt én uploadt:
 
@@ -102,11 +109,10 @@ npm run deploy:company md
 
 Die bestanden staan in `.gitignore`, net als `.env`.
 
-> **De gedeelde build en een standalone build zijn niet uitwisselbaar.** Hun
-> asset-paden zitten in de build gebakken: de gedeelde verwacht `/generator/`,
-> een standalone de root. Verwissel je ze, dan laadt de site niets — en dat
-> merk je pas als iemand hem opent. `deploy.cjs` controleert daarom beide
-> richtingen en weigert te uploaden als build en doelmap niet bij elkaar horen.
+> **Builds zijn niet uitwisselbaar.** `deploy.cjs` leest uit de build vanaf
+> welk pad hij geserveerd wordt en vergelijkt dat met de doelmap. Kloppen die
+> niet, dan weigert hij te uploaden — anders laadt de site niets en merk je dat
+> pas als iemand hem opent.
 
 Een standalone build draagt zijn eigen lettertypen, logo's en overlays. Alleen
 de afbeeldingen ín een handtekening blijven van `ASSET_BASE` komen: die worden
@@ -258,6 +264,7 @@ Build-time env vars:
 | --- | --- |
 | `NUXT_COMPANY` | Standalone build voor één bedrijf (`md`, `cf`, `gv`, `hvm`) |
 | `NUXT_SINGLE_FILE` | Bouwt naar één HTML-bestand met hash-routing |
+| `NUXT_BASE_PATH` | Pad waaronder de app draait, bv. `/tools/e-mail-handtekening/` |
 | `NUXT_PUBLIC_ASSET_BASE` | Host voor afbeeldingen in handtekeningen |
 | `NUXT_PUBLIC_UNLOCK_CODE` | Code voor het ontgrendelen van de bedrijfsvelden |
 

@@ -7,6 +7,12 @@ const isProd = process.env.NODE_ENV === 'production'
 const singleCompany = process.env.NUXT_COMPANY || ''
 const singleFile = process.env.NUXT_SINGLE_FILE === 'true'
 
+// Where the app is served from, when that is not the root of a domain. The
+// per-company installs live under /tools/e-mail-handtekening/ rather than at
+// the root, and asset paths are baked into the build — so this has to be known
+// at build time. Must start and end with a slash.
+const basePath = process.env.NUXT_BASE_PATH || ''
+
 export default defineNuxtConfig({
   ssr: false,
 
@@ -77,7 +83,7 @@ export default defineNuxtConfig({
     // Important:
     // For a true single file opened through file://, avoid /generator/ or /
     // because those are absolute paths.
-    baseURL: singleFile ? './' : singleCompany ? '/' : isProd ? '/generator/' : '/',
+    baseURL: singleFile ? './' : basePath || (singleCompany ? '/' : isProd ? '/generator/' : '/'),
 
     head: {
       title: 'Generator',

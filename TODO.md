@@ -5,6 +5,9 @@ beslissing van jullie kant — het is bewust níet stilzwijgend "opgelost".
 
 ## Afgesloten beslissingen
 
+- [x] **Stickerformaat bevestigd** op 101,6 × 63,8 mm (10 designeenheden per
+      mm), zoals aangenomen in `sticker.js`.
+
 - [x] **Vaste breedte van 580px behouden.** De vloeiende variant met MSO
       ghost-table loste de mobiele scroll-waarschuwing van de validator op,
       maar was niet te testen tegen Outlook op Windows — en die route is precies
@@ -47,6 +50,12 @@ beslissing van jullie kant — het is bewust níet stilzwijgend "opgelost".
 - [ ] **`.env` staat naast de code met FTP-wachtwoord in platte tekst.** Prima
       zolang de map lokaal blijft; noemenswaardig zodra er een repo of een
       tweede machine bij komt.
+- [ ] **De vier banner-bestanden zijn leeg.** `banner-md/cf/ge/hvm.png` zijn
+      byte-identiek (zelfde MD5) en volledig transparant: 1160 × 20 px waarin
+      elke pixel `(0,0,0,0)` is. Elke handtekening bevat dus een onzichtbare
+      strook plus een klikbare link eromheen. Ofwel echte banners aanleveren,
+      ofwel de bannerrij uit `signature.js` halen — dat scheelt ~150 tekens en
+      een HTTP-verzoek per handtekening.
 - [ ] **Telefoonopmaak is Belgisch en stil.** `formatPhoneNumber()` laat een
       buitenlands nummer ongemoeid doorlopen naar de handtekening. Prima nu,
       relevant zodra er een niet-Belgisch bedrijf bijkomt.

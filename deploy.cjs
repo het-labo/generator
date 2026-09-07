@@ -33,25 +33,32 @@ if (!fs.existsSync(path.join(localRoot, 'index.html'))) {
   fail('Er is niets gebouwd.', 'Draai eerst `npm run generate` (of gebruik `npm run shipit`).')
 }
 
-// The shared build is served from /generator/, a standalone build (NUXT_COMPANY)
-// from the root of a company's own domain. Their asset paths are baked in, so
-// uploading one where the other belongs leaves a site that loads nothing —
-// visible only once someone opens it. Check both directions before connecting.
+// Asset paths are baked into a build: the shared one expects /generator/, a
+// per-company install whatever NUXT_BASE_PATH was set to. Upload a build where
+// it does not belong and the page loads nothing — noticed only when someone
+// opens it. So read the base out of the build and check the target agrees.
 const indexHtml = fs.readFileSync(path.join(localRoot, 'index.html'), 'utf8')
-const sharedTarget = config.remoteRoot.includes('/generator')
-const sharedBuild = indexHtml.includes('"/generator/_nuxt/')
+const match = indexHtml.match(/(?:src|href)="([^"]*?)_nuxt\//)
+const buildBase = match ? match[1] : null
 
-if (sharedTarget && !sharedBuild) {
+if (!buildBase) {
+  fail('Kon in de build niet terugvinden vanaf welk pad hij geserveerd wordt.')
+}
+
+const remote = config.remoteRoot.endsWith('/') ? config.remoteRoot : `${config.remoteRoot}/`
+
+if (buildBase !== '/' && !remote.endsWith(buildBase)) {
   fail(
-    'Dit is een standalone build, maar de doelmap is de gedeelde /generator/.',
-    'Draai `npm run generate` opnieuw zonder NUXT_COMPANY.'
+    'De build en de doelmap horen niet bij elkaar.',
+    `De build verwacht ${buildBase}, maar de doelmap is ${remote}.\n` +
+      'Bouw opnieuw met het juiste NUXT_BASE_PATH, of corrigeer FTP_REMOTE_ROOT.'
   )
 }
 
-if (!sharedTarget && sharedBuild) {
-  fail(
-    'Dit is de gedeelde build, maar de doelmap is een eigen domein.',
-    'Draai `NUXT_COMPANY=<id> npm run generate` voor dat bedrijf.'
+if (buildBase === '/' && remote.replace(/\/$/, '').split('/').filter(Boolean).length > 1) {
+  console.warn(
+    `\n! Let op: deze build verwacht de root van een domein, maar wordt in ${remote} gezet.\n` +
+      '  Klopt dat niet, zet NUXT_BASE_PATH en bouw opnieuw.'
   )
 }
 

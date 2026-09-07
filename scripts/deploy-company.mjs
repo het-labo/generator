@@ -8,13 +8,18 @@
 //   FTP_HOST=ftp.mdbouw.be
 //   FTP_USER=...
 //   FTP_PASSWORD=...
-//   FTP_REMOTE_ROOT=/public_html/
+//   FTP_REMOTE_ROOT=/public_html/tools/e-mail-handtekening/
+//   BASE_PATH=/tools/e-mail-handtekening/
+//
+// BASE_PATH is the path the tool is served from. It has to be known at build
+// time because the asset paths are baked in, and it must match the tail of
+// FTP_REMOTE_ROOT — deploy.cjs refuses the upload when they disagree.
 //
 // Doing this by hand means exporting four variables per company and hoping the
 // last build in .output belongs to the one you are uploading — which is
 // exactly the mistake deploy.cjs now refuses to make.
 
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -45,13 +50,20 @@ if (!existsSync(envFile)) {
   )
 }
 
+// Read BASE_PATH here so the build gets it; deploy.cjs reads the rest itself.
+const basePath = (readFileSync(envFile, 'utf8').match(/^\s*BASE_PATH\s*=\s*(.+)$/m)?.[1] || '').trim()
+
+if (basePath && !(basePath.startsWith('/') && basePath.endsWith('/'))) {
+  bail('BASE_PATH moet met een slash beginnen en eindigen.', `Nu: ${basePath}`)
+}
+
 const company = COMPANIES[id]
-console.log(`\n▸ ${company.name} — bouwen…`)
+console.log(`\n▸ ${company.name} — bouwen${basePath ? ` voor ${basePath}` : ''}…`)
 
 const run = (command, args, env) =>
   spawnSync(command, args, { stdio: 'inherit', cwd: root, env: { ...process.env, ...env } })
 
-const build = run('npx', ['nuxt', 'generate'], { NUXT_COMPANY: id })
+const build = run('npx', ['nuxt', 'generate'], { NUXT_COMPANY: id, NUXT_BASE_PATH: basePath })
 if (build.status !== 0) bail('De build is mislukt.')
 
 console.log(`\n▸ ${company.name} — uploaden…`)
