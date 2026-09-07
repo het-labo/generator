@@ -140,12 +140,14 @@
 
             <div class="flex flex-wrap gap-2">
                 <Button class="flex-1 gap-2" size="lg" @click="copySignature">
-                    <ClipboardCheckIcon />
-                    Kopieer handtekening
+                    <CheckIcon v-if="copied === 'signature'" />
+                    <ClipboardCheckIcon v-else />
+                    {{ copied === 'signature' ? 'Gekopieerd!' : 'Kopieer handtekening' }}
                 </Button>
                 <Button variant="outline" size="lg" class="gap-2" @click="copyHtml">
-                    <CodeIcon />
-                    HTML
+                    <CheckIcon v-if="copied === 'html'" />
+                    <CodeIcon v-else />
+                    {{ copied === 'html' ? 'Gekopieerd!' : 'HTML' }}
                 </Button>
             </div>
 
@@ -169,8 +171,8 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
-import { ClipboardCheckIcon, CodeIcon, ImageIcon } from '@lucide/vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { CheckIcon, ClipboardCheckIcon, CodeIcon, ImageIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 
 const props = defineProps({
@@ -208,6 +210,19 @@ const comp = computed(() => COMPANIES[selectedCompanyId.value] || COMPANIES[DEFA
 
 const companyFieldsLocked = ref(true)
 const busy = ref(false)
+
+// Confirmation belongs on the button that was just clicked; a toast in the
+// corner is easy to miss when you are looking at your cursor.
+const copied = ref(null)
+let copiedTimer = null
+
+const markCopied = (which) => {
+    copied.value = which
+    clearTimeout(copiedTimer)
+    copiedTimer = setTimeout(() => (copied.value = null), 2000)
+}
+
+onBeforeUnmount(() => clearTimeout(copiedTimer))
 
 // Name/job/e-mail/phone are shared with the other generators, so filling them
 // in once is enough. Only the company block lives locally.
@@ -282,7 +297,8 @@ const copySignature = async () => {
                     'text/plain': new Blob([html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()], { type: 'text/plain' })
                 })
             ])
-            toast.success('Handtekening gekopieerd', { description: 'Plak in Outlook via Ctrl/Cmd + V.' })
+            markCopied('signature')
+            toast.success('Handtekening gekopieerd', { description: 'Plak in je e-mailprogramma met Cmd/Ctrl + V.' })
             return
         } catch (err) {
             console.error('Clipboard API copy failed', err)
@@ -323,7 +339,7 @@ const downloadImage = async () => {
 const copyHtml = async () => {
     try {
         await navigator.clipboard.writeText(signatureHtml.value)
-        toast.success('HTML gekopieerd')
+        markCopied('html')
     } catch (err) {
         console.error('Copy failed', err)
         toast.error('Kopiëren mislukt')
