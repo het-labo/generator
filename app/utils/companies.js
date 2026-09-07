@@ -71,7 +71,7 @@ export const COMPANIES = {
         bg: '#FFFAF6',
         color: '#17313C',
         x: 85,
-        y: { name: 85, job: 137, phone: 218, email: 259, website: 631.47, address: 661.47 },
+        y: { name: 85, job: 133, phone: 218, email: 259, website: 631.47, address: 661.47 },
         type: {
           name: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 48 },
           job: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 },
@@ -164,7 +164,7 @@ export const COMPANIES = {
         bg: '#FFFAF6',
         color: '#4E5A54',
         x: 85,
-        y: { name: 85, job: 137, phone: 218, email: 256, website: 633.47, address: 662.47 },
+        y: { name: 85, job: 133, phone: 218, email: 256, website: 633.47, address: 662.47 },
         type: {
           name: { family: FONT_STACKS.baskerville, weight: 600, size: 48, lineHeight: 48 },
           job: { family: FONT_STACKS.lato, size: 24, lineHeight: 29 },
@@ -246,7 +246,7 @@ export const COMPANIES = {
         bg: '#FFFAF6',
         color: '#0B395C',
         x: 85,
-        y: { name: 97.235, job: 149.235, phone: 231.235, email: 271.235, website: 619.235, address: 649.235 },
+        y: { name: 97.235, job: 145.235, phone: 231.235, email: 271.235, website: 619.235, address: 649.235 },
         type: {
           name: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 48 },
           job: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 },

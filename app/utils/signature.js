@@ -245,7 +245,7 @@ export const buildSignatureHtml = ({ company, form, photo = '', assetBase = ASSE
         </td>` : ''}
         <td style="padding:10px 0px 10px 0px; vertical-align:top; ${FONT_STACK}">
             <div style="${FONT_STACK}font-size:20px; line-height:24px; font-weight:bold; color:${company.colorSecondary}; margin:0; padding:0;">${name}</div>
-          <div style="${FONT_STACK}font-size:14px; line-height:normal; color:${company.colorPrimary}; margin:4px 0 0 0;">${job ? job + ' ' : ''}</div>
+          <div style="${FONT_STACK}font-size:14px; line-height:normal; color:${company.colorPrimary}; margin:0;">${job ? job + ' ' : ''}</div>
           ${contactTableHtml}
         </td>
       </tr>

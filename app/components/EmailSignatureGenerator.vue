@@ -139,19 +139,24 @@
             <SignaturePreview :html="signatureHtml" />
 
             <PreviewActions>
-                <Button class="flex-1 gap-2" size="lg" @click="copySignature">
+                <!--
+                    Alle drie even breed: basis-48 laat ze op een smal scherm
+                    onder elkaar vallen in plaats van de langste knop te
+                    verminken.
+                -->
+                <Button class="flex-1 basis-48 gap-2" size="lg" @click="copySignature">
                     <CheckIcon v-if="copied === 'signature'" />
                     <ClipboardCheckIcon v-else />
                     {{ copied === 'signature' ? 'Gekopieerd!' : 'Kopieer handtekening' }}
                 </Button>
-                <Button variant="outline" size="lg" class="gap-2" @click="copyHtml">
+                <Button variant="outline" size="lg" class="flex-1 basis-48 gap-2" @click="copyHtml">
                     <CheckIcon v-if="copied === 'html'" />
                     <CodeIcon v-else />
                     {{ copied === 'html' ? 'Gekopieerd!' : 'HTML' }}
                 </Button>
-                <Button variant="outline" size="lg" class="gap-2" :disabled="busy" @click="downloadImage">
+                <Button variant="outline" size="lg" class="flex-1 basis-48 gap-2" :disabled="busy" @click="downloadImage">
                     <ImageIcon />
-                    PNG
+                    Download PNG
                 </Button>
 
                 <template #note>
