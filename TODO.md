@@ -45,17 +45,32 @@ beslissing van jullie kant — het is bewust níet stilzwijgend "opgelost".
 
 ## Techniek
 
+- [ ] **De hosting van de vier klanten doet alleen onversleutelde FTP.**
+      Nagemeten: AUTH TLS wordt geweigerd (FTPS gaat niet) en poort 22 geeft
+      geen antwoord. Elke deploy stuurt gebruikersnaam en wachtwoord dus in
+      leesbare tekst over het netwerk. Vraag de hoster om FTPS of SFTP aan te
+      zetten; `ftp-deploy` ondersteunt beide, dus dat is daarna een
+      configuratiewijziging en geen nieuwe bibliotheek.
+
 - [ ] **Zet het project onder Git.** Er is nu geen versiebeheer en dus geen
       manier om een wijziging terug te draaien.
 - [ ] **`.env` staat naast de code met FTP-wachtwoord in platte tekst.** Prima
       zolang de map lokaal blijft; noemenswaardig zodra er een repo of een
       tweede machine bij komt.
-- [ ] **De vier banner-bestanden zijn leeg.** `banner-md/cf/ge/hvm.png` zijn
-      byte-identiek (zelfde MD5) en volledig transparant: 1160 × 20 px waarin
-      elke pixel `(0,0,0,0)` is. Elke handtekening bevat dus een onzichtbare
-      strook plus een klikbare link eromheen. Ofwel echte banners aanleveren,
-      ofwel de bannerrij uit `signature.js` halen — dat scheelt ~150 tekens en
-      een HTTP-verzoek per handtekening.
+- [ ] **Bannerslot: afspreken hoe je hem weer leegmaakt.** De vier
+      `banner-*.png` zijn bewust lege, volledig transparante strookjes: een
+      plek voor een tijdelijke campagne- of evenementafbeelding. Wat daarbij
+      telt is dat het bestand op de CDN staat en dus **met terugwerkende kracht
+      geldt** — zet je er een banner in, dan tonen ook alle eerder verzonden
+      mails die ineens. Loopt de campagne af en zet niemand het transparante
+      bestand terug, dan blijft elke mail ooit verstuurd een verlopen evenement
+      adverteren. Zet daar een einddatum op.
+
+      Praktisch: de placeholder is 1160 x 20 px. Een echte banner mag gerust
+      1160 x 200 zijn — `height:auto` schaalt hem naar 580 breed. De link
+      eromheen komt uit het veld "Banner-link", dus die kan per campagne naar
+      een actiepagina wijzen in plaats van naar de homepage.
+
 - [ ] **Telefoonopmaak is Belgisch en stil.** `formatPhoneNumber()` laat een
       buitenlands nummer ongemoeid doorlopen naar de handtekening. Prima nu,
       relevant zodra er een niet-Belgisch bedrijf bijkomt.
