@@ -1,7 +1,7 @@
 // Shared plumbing for the PDF exports: font loading, image conversion and the
 // mapping from the CSS font stacks onto the faces registered in the document.
 
-import { FONT_STACKS } from './business-card.js'
+import { FONT_STACKS, tinted } from './business-card.js'
 
 // PDF fonts are registered by family name and weight; map the CSS stacks the
 // specs use onto them.
@@ -79,7 +79,7 @@ export const loadPdfImage = (assetUrl, path) => {
  * jsPDF accepts. SVG sources carry their own intrinsic size, so they land here
  * at whatever resolution the file declares.
  */
-export const imageToCanvas = (img, crop) => {
+export const imageToCanvas = (img, crop, tint) => {
   const sx = crop ? img.width * crop.x : 0
   const sy = crop ? img.height * crop.y : 0
   const sw = crop ? img.width * crop.w : img.width
@@ -88,6 +88,6 @@ export const imageToCanvas = (img, crop) => {
   const canvas = document.createElement('canvas')
   canvas.width = sw
   canvas.height = sh
-  canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh)
+  canvas.getContext('2d').drawImage(tint ? tinted(img, tint) : img, sx, sy, sw, sh, 0, 0, sw, sh)
   return canvas
 }

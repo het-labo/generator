@@ -18,8 +18,8 @@ const mm = (units) => (units * CARD.trimWidth) / DESIGN.width
 /** design units -> points, for type sizes */
 const pt = (units) => (mm(units) / 25.4) * 72
 
-const cropToCanvas = (img, crop) => {
-  const canvas = imageToCanvas(img, crop)
+const cropToCanvas = (img, crop, tint) => {
+  const canvas = imageToCanvas(img, crop, tint)
   return { canvas, width: canvas.width, height: canvas.height }
 }
 
@@ -54,8 +54,8 @@ const withOpacity = (doc, opacity, draw) => {
   doc.restoreGraphicsState()
 }
 
-const drawImage = (doc, img, { x, y, width, height, opacity, crop }, offset) => {
-  const { canvas, width: sw, height: sh } = cropToCanvas(img, crop)
+const drawImage = (doc, img, { x, y, width, height, opacity, crop, tint }, offset) => {
+  const { canvas, width: sw, height: sh } = cropToCanvas(img, crop, tint)
   const w = mm(width)
   const h = mm(height ?? sh * (width / sw))
 

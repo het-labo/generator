@@ -11,6 +11,10 @@
 
 import { FONT_STACKS } from './business-card.js'
 
+// The one tone on HVM's white card: the corner wedge and the HVM wordmark
+// behind the text are the same cream, so they read as one graphic.
+const HVM_CREAM = '#FFFAF6'
+
 export const COMPANIES = {
   md: {
     id: 'md',
@@ -346,9 +350,24 @@ export const COMPANIES = {
           contact: { family: FONT_STACKS.sourceSans, size: 32, lineHeight: 40 },
           footer: { family: FONT_STACKS.sourceSans, size: 24, lineHeight: 30 }
         },
-        // White card with a cream wedge left showing in the top-right corner.
-        wedgeColor: '#FFFAF6',
-        wedge: { x: 600, y: 600 }
+        // White card with a cream corner and the HVM wordmark at the foot.
+        //
+        // The wedge runs from the top edge down to the bottom-right corner, at
+        // the same angle as the diagonal in the logo itself: the logo's edge
+        // drops 663px over 430px, and 776.47 / (1200 - 700) is within a pixel
+        // of that over the height of the card.
+        wedgeColor: HVM_CREAM,
+        wedge: { x: 700, y: 776.47 },
+        watermark: {
+          // Only the letters, lifted out of the logo where they are knocked
+          // out of the red wedge; the file holds the shape in its alpha, so
+          // the colour comes from here.
+          src: 'assets/logos/wordmark-hvm.png',
+          tint: HVM_CREAM,
+          x: 420,
+          y: 505,
+          width: 640
+        }
       }
     },
     sticker: {

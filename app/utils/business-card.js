@@ -128,7 +128,32 @@ const drawTextFitted = (ctx, str, style) => {
 }
 
 /** Draws an image at an exact box, preserving aspect ratio by fitting width. */
-const drawImageAt = (ctx, img, { x, y, width, height, opacity = 1, crop }) => {
+// A mask carries its shape in the alpha channel and nothing else, so the
+// colour can stay a single value in the company config rather than being baked
+// into the file. Cached: recolouring is a full redraw of the bitmap, and the
+// preview re-renders on every keystroke.
+const tintCache = new Map()
+
+export const tinted = (img, color) => {
+  const key = `${img.src}|${color}`
+
+  if (!tintCache.has(key)) {
+    const canvas = document.createElement('canvas')
+    canvas.width = img.width
+    canvas.height = img.height
+
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0)
+    ctx.globalCompositeOperation = 'source-in'
+    ctx.fillStyle = color
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    tintCache.set(key, canvas)
+  }
+  return tintCache.get(key)
+}
+
+const drawImageAt = (ctx, img, { x, y, width, height, opacity = 1, crop, tint }) => {
   const sx = crop ? img.width * crop.x : 0
   const sy = crop ? img.height * crop.y : 0
   const sw = crop ? img.width * crop.w : img.width
@@ -139,7 +164,7 @@ const drawImageAt = (ctx, img, { x, y, width, height, opacity = 1, crop }) => {
 
   ctx.save()
   ctx.globalAlpha = opacity
-  ctx.drawImage(img, sx, sy, sw, sh, x, y, drawWidth, drawHeight)
+  ctx.drawImage(tint ? tinted(img, tint) : img, sx, sy, sw, sh, x, y, drawWidth, drawHeight)
   ctx.restore()
 }
 

@@ -37,21 +37,14 @@
                     </div>
 
                     <TabsList class="w-full lg:w-fit">
-                        <TabsTrigger value="signature" class="gap-0 min-[520px]:gap-1.5">
-                            <MailIcon class="size-4 min-[520px]:size-3.5" />
-                            <span class="sr-only min-[520px]:not-sr-only">Handtekening</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="profile" class="gap-0 min-[520px]:gap-1.5">
-                            <UserRoundIcon class="size-4 min-[520px]:size-3.5" />
-                            <span class="sr-only min-[520px]:not-sr-only">Profielfoto</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="card" class="gap-0 min-[520px]:gap-1.5">
-                            <CreditCardIcon class="size-4 min-[520px]:size-3.5" />
-                            <span class="sr-only min-[520px]:not-sr-only">Visitekaartje</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="sticker" class="gap-0 min-[520px]:gap-1.5">
-                            <StickerIcon class="size-4 min-[520px]:size-3.5" />
-                            <span class="sr-only min-[520px]:not-sr-only">Sticker</span>
+                        <TabsTrigger
+                            v-for="tab in tabs"
+                            :key="tab.id"
+                            :value="tab.id"
+                            class="gap-0 min-[520px]:gap-1.5"
+                        >
+                            <component :is="tab.icon" class="size-4 min-[520px]:size-3.5" />
+                            <span class="sr-only min-[520px]:not-sr-only">{{ tab.label }}</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -65,16 +58,16 @@
             </header>
 
             <main class="mx-auto w-full max-w-[1400px] flex-1 px-4 py-8 sm:px-6 lg:px-8">
-                <TabsContent value="signature" class="mt-0">
+                <TabsContent v-if="isOn('signature')" value="signature" class="mt-0">
                     <EmailSignatureGenerator :initial-company-id="company.id" hide-selection />
                 </TabsContent>
-                <TabsContent value="profile" class="mt-0">
+                <TabsContent v-if="isOn('profile')" value="profile" class="mt-0">
                     <ProfilePhotoGenerator :initial-company-id="company.id" />
                 </TabsContent>
-                <TabsContent value="card" class="mt-0">
+                <TabsContent v-if="isOn('card')" value="card" class="mt-0">
                     <BusinessCardGenerator :initial-company-id="company.id" />
                 </TabsContent>
-                <TabsContent value="sticker" class="mt-0">
+                <TabsContent v-if="isOn('sticker')" value="sticker" class="mt-0">
                     <StickerGenerator :initial-company-id="company.id" />
                 </TabsContent>
             </main>
@@ -95,9 +88,28 @@ const props = defineProps({
     }
 })
 
-const activeTab = ref('signature')
+const { app: { baseURL }, public: { assetRoot, companyId, tabs: enabled } } = useRuntimeConfig()
 
-const { app: { baseURL }, public: { assetRoot, companyId } } = useRuntimeConfig()
+const ALL_TABS = [
+    { id: 'signature', label: 'Handtekening', icon: MailIcon },
+    { id: 'profile', label: 'Profielfoto', icon: UserRoundIcon },
+    { id: 'card', label: 'Visitekaartje', icon: CreditCardIcon },
+    { id: 'sticker', label: 'Sticker', icon: StickerIcon }
+]
+
+// Switched off per build with NUXT_TAB_* in that company's .env — see the
+// README. Turning everything off is a misconfiguration rather than a wish, so
+// that falls back to the full set instead of shipping an empty app.
+const wanted = ALL_TABS.filter((tab) => enabled?.[tab.id] !== false)
+
+if (!wanted.length) {
+    console.warn('Alle tabbladen staan uit in .env; ze worden allemaal getoond.')
+}
+
+const tabs = wanted.length ? wanted : ALL_TABS
+const isOn = (id) => tabs.some((tab) => tab.id === id)
+
+const activeTab = ref(tabs[0].id)
 
 // Only the shared build has a company picker to return to.
 const hasOverview = !companyId

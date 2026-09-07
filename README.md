@@ -95,6 +95,24 @@ FTP_REMOTE_ROOT=/public_html/tools/e-mail-handtekening/
 BASE_PATH=/tools/e-mail-handtekening/
 ```
 
+### Tabbladen aan- of uitzetten
+
+Elke installatie toont standaard alle vier de generators. Wil je er tijdelijk
+een weglaten, zet dan in de `.env` van dat bedrijf:
+
+```
+NUXT_TAB_STICKER=false
+```
+
+Dezelfde vorm bestaat voor `NUXT_TAB_HANDTEKENING`, `NUXT_TAB_PROFIELFOTO` en
+`NUXT_TAB_VISITEKAARTJE`. Herkend als uit: `false`, `0`, `no`, `nee`, `uit`.
+Alles wat er niet staat, staat aan — een typefout in de naam kan een tabblad
+dus alleen maar aan laten, nooit per ongeluk verbergen.
+
+De vlag geldt per build. Zet je hem in `.env.hvm`, dan verdwijnt het tabblad op
+dakwerkenh-vm.be maar niet op de gedeelde library-versie, want die is één build
+voor alle vier de bedrijven.
+
 Werkt SSH op een account, zet er dan `FTP_RSYNC=true` bij in plaats van een
 wachtwoord. De sleutel doet het werk, er gaat niets onversleuteld over de lijn,
 en de map wordt gelijkgetrokken met de build in plaats van erbovenop gestapeld —

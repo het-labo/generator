@@ -13,6 +13,18 @@ const singleFile = process.env.NUXT_SINGLE_FILE === 'true'
 // at build time. Must start and end with a slash.
 const basePath = process.env.NUXT_BASE_PATH || ''
 
+// Which generators this build offers. Everything is on unless a variable
+// explicitly turns it off, so an install that sets nothing keeps all four —
+// and a typo in the name can only ever leave a tab switched on.
+const tabOff = (name: string) => /^(0|false|no|nee|uit)$/i.test(process.env[`NUXT_TAB_${name}`] || '')
+
+const tabs = {
+  signature: !tabOff('HANDTEKENING'),
+  profile: !tabOff('PROFIELFOTO'),
+  card: !tabOff('VISITEKAARTJE'),
+  sticker: !tabOff('STICKER')
+}
+
 export default defineNuxtConfig({
   ssr: false,
 
@@ -75,7 +87,11 @@ export default defineNuxtConfig({
       // edits, not a security control — the app is fully client-side, so the
       // value is readable in the shipped bundle. Override with
       // NUXT_PUBLIC_UNLOCK_CODE.
-      unlockCode: 'd5E6mQ2og0K'
+      unlockCode: 'd5E6mQ2og0K',
+
+      // Per-tab on/off, from NUXT_TAB_HANDTEKENING, NUXT_TAB_PROFIELFOTO,
+      // NUXT_TAB_VISITEKAARTJE and NUXT_TAB_STICKER in the build's .env.
+      tabs
     }
   },
 

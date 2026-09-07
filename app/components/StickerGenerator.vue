@@ -68,12 +68,33 @@
 
         <template #preview>
         <div class="space-y-4">
-            <div>
-                <h2 class="text-lg font-semibold">Voorbeeld</h2>
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-semibold">Voorbeeld</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Switch id="show-sticker-guides" v-model="showGuides" />
+                    <Label for="show-sticker-guides">Snijlijnen</Label>
+                </div>
             </div>
-            <div ref="frameRef" class="overflow-hidden rounded-lg border bg-muted/30">
+
+            <div ref="frameRef" class="relative overflow-hidden rounded-lg border bg-muted/30">
                 <canvas ref="canvasRef" class="block w-full" />
+                <!--
+                    An overlay, never part of the export: the printer gets clean
+                    artwork. Inset equals the bleed as a fraction of the full
+                    canvas, so it lands on the trim line at any preview size.
+                -->
+                <div
+                    v-if="showGuides"
+                    class="pointer-events-none absolute border border-dashed border-red-500/70"
+                    :style="guideStyle"
+                />
             </div>
+
+            <p v-if="showGuides" class="text-xs text-muted-foreground">
+                De rode lijn is het snijformaat. Alles daarbuiten is afloop en wordt weggesneden.
+            </p>
             <PreviewActions>
                 <template #details>
                     <dt class="text-muted-foreground">Snijformaat</dt>
@@ -145,6 +166,13 @@ const resetSizes = () => {
 watch(company, resetSizes)
 
 const canvasRef = ref(null)
+const showGuides = ref(true)
+
+const guideStyle = computed(() => {
+    const insetX = (STICKER.bleed / (STICKER.widthMm + STICKER.bleed * 2)) * 100
+    const insetY = (STICKER.bleed / (STICKER.heightMm + STICKER.bleed * 2)) * 100
+    return { inset: `${insetY}% ${insetX}%` }
+})
 const frameRef = ref(null)
 const busy = ref(false)
 
