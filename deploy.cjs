@@ -1,4 +1,5 @@
-require('dotenv').config()
+// DOTENV_CONFIG_PATH lets deploy-company.mjs point this at .env.<id>.
+require('dotenv').config({ path: process.env.DOTENV_CONFIG_PATH || undefined })
 const FtpDeploy = require('ftp-deploy')
 const fs = require('fs')
 const path = require('path')
@@ -32,17 +33,25 @@ if (!fs.existsSync(path.join(localRoot, 'index.html'))) {
   fail('Er is niets gebouwd.', 'Draai eerst `npm run generate` (of gebruik `npm run shipit`).')
 }
 
-// The shared build is served from /generator/; a standalone build (NUXT_COMPANY)
-// is rooted at /. Uploading the wrong one to the shared folder breaks the site
-// in a way that is easy to miss, so check before touching the server.
+// The shared build is served from /generator/, a standalone build (NUXT_COMPANY)
+// from the root of a company's own domain. Their asset paths are baked in, so
+// uploading one where the other belongs leaves a site that loads nothing —
+// visible only once someone opens it. Check both directions before connecting.
 const indexHtml = fs.readFileSync(path.join(localRoot, 'index.html'), 'utf8')
-const expectedBase = config.remoteRoot.includes('/generator') ? '/generator/' : null
+const sharedTarget = config.remoteRoot.includes('/generator')
+const sharedBuild = indexHtml.includes('"/generator/_nuxt/')
 
-if (expectedBase && !indexHtml.includes(`"${expectedBase}_nuxt/`)) {
+if (sharedTarget && !sharedBuild) {
   fail(
-    'De build in .output past niet bij de doelmap.',
-    `Verwacht een build met baseURL ${expectedBase} — dit lijkt een standalone build.\n` +
-      'Draai `npm run generate` opnieuw zonder NUXT_COMPANY.'
+    'Dit is een standalone build, maar de doelmap is de gedeelde /generator/.',
+    'Draai `npm run generate` opnieuw zonder NUXT_COMPANY.'
+  )
+}
+
+if (!sharedTarget && sharedBuild) {
+  fail(
+    'Dit is de gedeelde build, maar de doelmap is een eigen domein.',
+    'Draai `NUXT_COMPANY=<id> npm run generate` voor dat bedrijf.'
   )
 }
 

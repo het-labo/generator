@@ -83,23 +83,34 @@ Of apart: `npm run generate` (naar `.output/public`) en `npm run deploy`.
 
 ### 2. Standalone per bedrijf
 
-Voor hosting op de root van een eigen domein (bv. `signature.mdbouw.be`):
+Elk bedrijf op de root van zijn eigen domein (bv. `signature.mdbouw.be`). Zet
+de hostinggegevens één keer per bedrijf in `.env.<id>` — dus `.env.md`,
+`.env.cf`, `.env.gv`, `.env.hvm`:
 
-```bash
-NUXT_COMPANY=md npm run generate
+```
+FTP_HOST=ftp.mdbouw.be
+FTP_USER=…
+FTP_PASSWORD=…
+FTP_REMOTE_ROOT=/public_html/
 ```
 
-Bedrijfscodes: `md`, `cf`, `gv`, `hvm`.
-
-Deployen naar een andere server:
+Daarna is het per bedrijf één commando, dat bouwt én uploadt:
 
 ```bash
-FTP_HOST=ftp.companyname.be \
-FTP_USER=gebruiker \
-FTP_PASSWORD=wachtwoord \
-FTP_REMOTE_ROOT=/public_html/ \
-npm run deploy
+npm run deploy:company md
 ```
+
+Die bestanden staan in `.gitignore`, net als `.env`.
+
+> **De gedeelde build en een standalone build zijn niet uitwisselbaar.** Hun
+> asset-paden zitten in de build gebakken: de gedeelde verwacht `/generator/`,
+> een standalone de root. Verwissel je ze, dan laadt de site niets — en dat
+> merk je pas als iemand hem opent. `deploy.cjs` controleert daarom beide
+> richtingen en weigert te uploaden als build en doelmap niet bij elkaar horen.
+
+Een standalone build draagt zijn eigen lettertypen, logo's en overlays. Alleen
+de afbeeldingen ín een handtekening blijven van `ASSET_BASE` komen: die worden
+opgehaald vanuit de mailbox van de ontvanger en moeten dus absoluut zijn.
 
 ### 3. Eén los HTML-bestand per bedrijf
 

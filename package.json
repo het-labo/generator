@@ -12,6 +12,7 @@
     "check:update": "node scripts/check-signatures.mjs --update",
     "preview": "nuxt preview",
     "deploy": "node deploy.cjs",
+    "deploy:company": "node scripts/deploy-company.mjs",
     "shipit": "npm run generate && npm run deploy",
     "postinstall": "nuxt prepare"
   },
