@@ -92,7 +92,8 @@ export const COMPANIES = {
       logo: 'assets/logos/logo-md-white.png',
       logoBox: { x: 35, y: 35, width: 190, height: 132 },
       monogram: 'assets/logos/monogram-md-white.png',
-      monogramBox: { x: 900, y: 483, width: 118, height: 116 },
+      // Bottom-right on the same 35-unit margin as the logo and footer.
+      monogramBox: { x: 863.2, y: 487, width: 117.8, height: 116 },
       title: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 52, letterSpacing: -0.015 },
       body: { family: FONT_STACKS.sourceSans, weight: 400, size: 22, lineHeight: 32 },
       footer: { family: FONT_STACKS.sourceSans, weight: 400, size: 18, lineHeight: 26 }
@@ -266,7 +267,7 @@ export const COMPANIES = {
       logo: 'assets/logos/logo-ge-white.png',
       logoBox: { x: 35, y: 35, width: 260, height: 55 },
       monogram: 'assets/logos/monogram-ge-white.png',
-      monogramBox: { x: 908, y: 495, width: 108, height: 108 },
+      monogramBox: { x: 873, y: 495, width: 108, height: 108 },
       title: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 52, letterSpacing: -0.015 },
       body: { family: FONT_STACKS.sourceSans, weight: 400, size: 22, lineHeight: 32 },
       footer: { family: FONT_STACKS.sourceSans, weight: 400, size: 18, lineHeight: 26 }
@@ -354,7 +355,7 @@ export const COMPANIES = {
       logo: 'assets/logos/logo-hvm-white.png',
       logoBox: { x: 35, y: 35, width: 150, height: 172.6 },
       monogram: 'assets/logos/monogram-hvm-white.png',
-      monogramBox: { x: 908, y: 495, width: 108, height: 108 },
+      monogramBox: { x: 873, y: 495, width: 108, height: 108 },
       title: { family: FONT_STACKS.workSans, weight: 600, size: 48, lineHeight: 52, letterSpacing: -0.015 },
       body: { family: FONT_STACKS.sourceSans, weight: 400, size: 22, lineHeight: 32 },
       footer: { family: FONT_STACKS.sourceSans, weight: 400, size: 18, lineHeight: 26 }

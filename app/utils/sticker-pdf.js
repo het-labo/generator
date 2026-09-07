@@ -2,7 +2,7 @@
 // Mirrors sticker.js, so the preview and the print file cannot drift.
 
 import { PDF_FONTS, PDF_FAMILY, fetchPdfFont, imageToCanvas, loadPdfImage } from './pdf-shared.js'
-import { STICKER, STICKER_DESIGN, STICKER_TEXT, resolveStickerType, wrapLines } from './sticker.js'
+import { STICKER, STICKER_DESIGN, STICKER_TEXT, layoutStickerText, resolveStickerType } from './sticker.js'
 
 /** design units -> millimetres */
 const mm = (units) => (units * STICKER.widthMm) / STICKER_DESIGN.width
@@ -88,18 +88,9 @@ export const buildStickerPdf = async ({ company, content, assetUrl }) => {
     doc.text(str, xMm, offset + mm(topUnits + (style.lineHeight - style.size) / 2), options)
   }
 
-  measure.font = `${type.title.weight || 400} ${type.title.size}px ${type.title.family}`
-  measure.letterSpacing = type.title.letterSpacing ? `${type.title.letterSpacing * type.title.size}px` : '0px'
-  const titleLines = wrapLines(measure, (content.title || '').trim(), STICKER_TEXT.width)
-  titleLines.forEach((l, i) => line(l, type.title, STICKER_TEXT.titleTop + i * type.title.lineHeight, 'center', centre))
-
-  const bodyTop = STICKER_TEXT.bodyTop + Math.max(titleLines.length - 1, 0) * type.title.lineHeight
-
-  measure.font = `${type.body.weight || 400} ${type.body.size}px ${type.body.family}`
-  measure.letterSpacing = '0px'
-  wrapLines(measure, content.body, STICKER_TEXT.width).forEach((l, i) =>
-    line(l, type.body, bodyTop + i * type.body.lineHeight, 'center', centre)
-  )
+  const block = layoutStickerText(measure, type, content)
+  for (const l of block.title) line(l.text, type.title, l.top, 'center', centre)
+  for (const l of block.body) line(l.text, type.body, l.top, 'center', centre)
 
   line((content.footer || '').trim(), type.footer, STICKER_TEXT.footerTop, 'left', offset + mm(STICKER_TEXT.footerX))
 

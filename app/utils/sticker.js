@@ -22,15 +22,41 @@ export const STICKER = {
 
 export const STICKER_DESIGN = { width: 1016, height: 638 }
 
-// Text block, centred in the artboard: 480 wide, 172 tall.
+// The title/body block is centred in the artboard rather than pinned to a
+// fixed y. With the spec's own content that reproduces the approved layout
+// exactly (52 + 24 gap + 96 = 172 tall, centred on 319, so top 233), and it
+// keeps the block centred when the body is empty or the title wraps.
 const TEXT = {
   width: 480,
-  titleTop: 233,
-  titleHeight: 52,
-  bodyTop: 309,
+  centreY: 319,
+  gap: 24,
   footerX: 35,
   // Frame 1000007544 is 77 tall at y 526 and bottom-aligns its 26-tall line.
   footerTop: 577
+}
+
+/**
+ * Lays out the centred text block: which lines go where, given the content
+ * that is actually there. Shared with the PDF so both place it identically.
+ */
+export const layoutStickerText = (measure, type, content) => {
+  measure.font = `${type.title.weight || 400} ${type.title.size}px ${type.title.family}`
+  measure.letterSpacing = type.title.letterSpacing ? `${type.title.letterSpacing * type.title.size}px` : '0px'
+  const titleLines = (content.title || '').trim() ? wrapLines(measure, content.title.trim(), TEXT.width) : []
+
+  measure.font = `${type.body.weight || 400} ${type.body.size}px ${type.body.family}`
+  measure.letterSpacing = '0px'
+  const bodyLines = (content.body || '').trim() ? wrapLines(measure, content.body.trim(), TEXT.width) : []
+
+  const titleHeight = titleLines.length * type.title.lineHeight
+  const bodyHeight = bodyLines.length * type.body.lineHeight
+  const gap = titleLines.length && bodyLines.length ? TEXT.gap : 0
+  const top = TEXT.centreY - (titleHeight + gap + bodyHeight) / 2
+
+  return {
+    title: titleLines.map((text, i) => ({ text, top: top + i * type.title.lineHeight })),
+    body: bodyLines.map((text, i) => ({ text, top: top + titleHeight + gap + i * type.body.lineHeight }))
+  }
 }
 
 /**
@@ -167,23 +193,17 @@ export const renderSticker = async (canvas, { company, content, assetUrl, dpi = 
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
 
-  const title = (content.title || '').trim()
-  setFont(ctx, type.title, spec.color)
-  const titleLines = wrapLines(ctx, title, TEXT.width)
-  titleLines.forEach((line, i) => {
-    const top = TEXT.titleTop + i * type.title.lineHeight
-    ctx.fillText(line, centreX, top + (type.title.lineHeight - type.title.size) / 2)
-  })
+  const block = layoutStickerText(ctx, type, content)
 
-  // The body sits below the title; extra title lines push it down rather than
-  // overlapping it.
-  const bodyTop = TEXT.bodyTop + Math.max(titleLines.length - 1, 0) * type.title.lineHeight
+  setFont(ctx, type.title, spec.color)
+  for (const line of block.title) {
+    ctx.fillText(line.text, centreX, line.top + (type.title.lineHeight - type.title.size) / 2)
+  }
 
   setFont(ctx, type.body, spec.color)
-  wrapLines(ctx, content.body, TEXT.width).forEach((line, i) => {
-    const top = bodyTop + i * type.body.lineHeight
-    ctx.fillText(line, centreX, top + (type.body.lineHeight - type.body.size) / 2)
-  })
+  for (const line of block.body) {
+    ctx.fillText(line.text, centreX, line.top + (type.body.lineHeight - type.body.size) / 2)
+  }
 
   ctx.textAlign = 'left'
   setFont(ctx, type.footer, spec.color)
