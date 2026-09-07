@@ -12,7 +12,7 @@
                 <CardContent class="space-y-4">
                     <button
                         type="button"
-                        class="flex w-full flex-col items-center gap-2 rounded-xl border-2 border-dashed p-8 transition-colors hover:border-foreground/30 hover:bg-muted/40"
+                        class="flex w-full cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-8 transition-colors hover:border-foreground/30 hover:bg-muted/40"
                         :class="isDragging && 'border-foreground/40 bg-muted/60'"
                         @click="fileInput?.click()"
                         @dragover.prevent="isDragging = true"
@@ -60,7 +60,7 @@
                         <div class="grid grid-cols-3 gap-3">
                             <button
                                 type="button"
-                                class="group flex flex-col items-center gap-2 rounded-xl border-2 p-2 transition-colors"
+                                class="group flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-2 transition-colors"
                                 :class="!selectedOverlay ? 'border-primary' : 'border-border hover:border-foreground/30'"
                                 @click="handleOverlaySelect(null)"
                             >
@@ -74,7 +74,7 @@
                                 v-for="overlay in overlays"
                                 :key="overlay.id"
                                 type="button"
-                                class="flex flex-col items-center gap-2 rounded-xl border-2 p-2 transition-colors"
+                                class="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-2 transition-colors"
                                 :class="selectedOverlay?.id === overlay.id ? 'border-primary' : 'border-border hover:border-foreground/30'"
                                 @click="handleOverlaySelect(overlay)"
                             >

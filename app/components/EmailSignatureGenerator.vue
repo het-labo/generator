@@ -11,7 +11,7 @@
                         v-for="c in COMPANY_LIST"
                         :key="c.id"
                         type="button"
-                        class="rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-colors"
+                        class="cursor-pointer rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-colors"
                         :class="
                             selectedCompanyId === c.id
                                 ? 'text-white'

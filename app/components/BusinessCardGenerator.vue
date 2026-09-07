@@ -95,7 +95,6 @@
             <div class="flex items-start justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-semibold">Voorbeeld</h2>
-                    <p class="text-sm text-muted-foreground">Voorkant en achterkant, op ware verhouding.</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <Switch id="show-guides" v-model="showGuides" />

@@ -84,10 +84,6 @@
                         <dd class="tabular-nums">{{ exportSize.width }} × {{ exportSize.height }} px</dd>
                     </dl>
 
-                    <div class="rounded-lg border border-dashed p-3 text-xs text-muted-foreground">
-                        Het Figma-bestand geeft geen millimeters; dit gaat uit van 10 designeenheden per mm. Klopt dat
-                        niet, geef het formaat door — het is één regel in <code>sticker.js</code>.
-                    </div>
 
                     <Button class="w-full gap-2" size="lg" :disabled="busy" @click="downloadPdf">
                         <FileTextIcon />
@@ -106,7 +102,6 @@
         <div class="space-y-4">
             <div>
                 <h2 class="text-lg font-semibold">Voorbeeld</h2>
-                <p class="text-sm text-muted-foreground">Op ware verhouding, inclusief afloop.</p>
             </div>
             <div ref="frameRef" class="overflow-hidden rounded-lg border bg-muted/30">
                 <canvas ref="canvasRef" class="block w-full" />
