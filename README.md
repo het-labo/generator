@@ -95,10 +95,24 @@ FTP_REMOTE_ROOT=/public_html/tools/e-mail-handtekening/
 BASE_PATH=/tools/e-mail-handtekening/
 ```
 
-Biedt een account SFTP, zet er dan `FTP_SFTP=true` bij. De sleutel doet dan
-het werk en er gaat geen wachtwoord meer over de lijn; standaard wordt
-`~/.ssh/id_ed25519` gebruikt, of `FTP_PRIVATE_KEY` als hij elders staat. Zonder
-die vlag blijft het gewone FTP — dat verschilt per hostingaccount.
+Werkt SSH op een account, zet er dan `FTP_RSYNC=true` bij in plaats van een
+wachtwoord. De sleutel doet het werk, er gaat niets onversleuteld over de lijn,
+en de map wordt gelijkgetrokken met de build in plaats van erbovenop gestapeld —
+oude hashbestanden van vorige builds verdwijnen dus vanzelf. Standaard wordt
+`~/.ssh/id_ed25519` gebruikt, of `FTP_PRIVATE_KEY` als hij elders staat.
+
+Omdat rsync met `--delete` draait, weigert het script te starten wanneer
+`FTP_REMOTE_ROOT` naar de root van een site wijst: één typefout zou anders de
+hele website leegmaken. Wijs hem altijd naar de submap.
+
+`FTP_SFTP=true` bestaat ook nog, maar gebruik het alleen als rsync op de server
+ontbreekt. Het uploadt bestand per bestand: bij Combell duurde één bestand van
+88 bytes 25 seconden en liep een volledige build vast, waar rsync dezelfde 86
+bestanden in nog geen twee seconden doet. Zonder een van beide vlaggen blijft
+het gewoon FTP — dat verschilt per hostingaccount.
+
+Casa Futura draait op rsync; de andere drie op FTP, omdat daar nog geen
+SSH-sleutel toegevoegd kon worden in het Combell-paneel.
 
 `BASE_PATH` is het pad waaronder de tool draait. Dat moet bij het **bouwen**
 bekend zijn, want de asset-paden zitten in de build gebakken — je kunt een
